@@ -17,6 +17,7 @@ fi
 echo "Deleting AKS cluster '${CLUSTER_NAME}'..."
 
 az aks delete \
+    --subscription "${SUBSCRIPTION}" \
     --resource-group "${RESOURCE_GROUP}" \
     --name "${CLUSTER_NAME}" \
     --yes

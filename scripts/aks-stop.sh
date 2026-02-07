@@ -7,6 +7,7 @@ setup_logging "aks-stop"
 echo "Stopping AKS cluster '${CLUSTER_NAME}'..."
 
 az aks stop \
+    --subscription "${SUBSCRIPTION}" \
     --resource-group "${RESOURCE_GROUP}" \
     --name "${CLUSTER_NAME}"
 

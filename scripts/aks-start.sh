@@ -7,6 +7,7 @@ setup_logging "aks-start"
 echo "Starting AKS cluster '${CLUSTER_NAME}'..."
 
 az aks start \
+    --subscription "${SUBSCRIPTION}" \
     --resource-group "${RESOURCE_GROUP}" \
     --name "${CLUSTER_NAME}"
 

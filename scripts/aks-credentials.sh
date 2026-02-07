@@ -7,6 +7,7 @@ setup_logging "aks-credentials"
 echo "Fetching credentials for cluster '${CLUSTER_NAME}'..."
 
 az aks get-credentials \
+    --subscription "${SUBSCRIPTION}" \
     --resource-group "${RESOURCE_GROUP}" \
     --name "${CLUSTER_NAME}" \
     --overwrite-existing

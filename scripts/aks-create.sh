@@ -12,6 +12,7 @@ echo "  VM size:     ${NODE_VM_SIZE}"
 echo ""
 
 az aks create \
+    --subscription "${SUBSCRIPTION}" \
     --resource-group "${RESOURCE_GROUP}" \
     --name "${CLUSTER_NAME}" \
     --node-count "${NODE_COUNT}" \

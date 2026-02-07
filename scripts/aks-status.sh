@@ -6,6 +6,7 @@ setup_logging "aks-status"
 
 echo "=== Cluster Info ==="
 az aks show \
+    --subscription "${SUBSCRIPTION}" \
     --resource-group "${RESOURCE_GROUP}" \
     --name "${CLUSTER_NAME}" \
     --query "{name:name, status:powerState.code, kubernetesVersion:kubernetesVersion, nodeCount:agentPoolProfiles[0].count, vmSize:agentPoolProfiles[0].vmSize, location:location}" \
@@ -14,6 +15,7 @@ az aks show \
 echo ""
 echo "=== Node Pool ==="
 az aks nodepool list \
+    --subscription "${SUBSCRIPTION}" \
     --resource-group "${RESOURCE_GROUP}" \
     --cluster-name "${CLUSTER_NAME}" \
     --output table
