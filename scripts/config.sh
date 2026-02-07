@@ -20,6 +20,11 @@ mkdir -p "${LOG_DIR}"
 # Then tail from another terminal:
 #   tail -f /tmp/${USER}-portainer/script-name.log
 setup_logging() {
+    if [[ -z "${1:-}" ]]; then
+        echo "Error: setup_logging requires a script name." >&2
+        echo "Usage: setup_logging <script-name>" >&2
+        exit 1
+    fi
     local script_name="${1}"
     local log_file="${LOG_DIR}/${script_name}.log"
     echo "Logging to ${log_file}"
