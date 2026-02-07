@@ -7,7 +7,7 @@ setup_logging "portainer-status"
 if ! helm status portainer -n portainer >/dev/null 2>&1; then
     echo "Portainer Helm release 'portainer' not found in namespace 'portainer'."
     echo "Run ./scripts/portainer-install.sh to install it."
-    exit 0
+    exit 1
 fi
 
 echo "=== Helm Release ==="
