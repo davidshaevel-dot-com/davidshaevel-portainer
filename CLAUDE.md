@@ -108,17 +108,56 @@ related-issues: TT-XXX
 **CRITICAL: NEVER MERGE WITHOUT CODE REVIEW**
 
 1. **Create PR** with descriptive title and comprehensive description
-2. **Wait for review**
-3. **Address feedback** before merging
-4. **Merge Strategy:** Always use **Squash and Merge**
+2. **Wait for review** (Gemini Code Assist or human reviewer)
+3. **Address feedback:**
+   - CRITICAL and HIGH issues: Must fix
+   - MEDIUM issues: Evaluate and decide
+4. **Post summary comment** with all fixes addressed
+5. **Merge only after** all review feedback resolved
+
+**Merge Strategy:** Always use **Squash and Merge** for pull requests.
 
 ```bash
 # Merge PR with squash
 gh pr merge <PR_NUMBER> --squash
 
-# Delete the remote branch
+# Delete the remote branch (--delete-branch doesn't work with worktrees)
 git push origin --delete <branch-name>
 ```
+
+#### Reply to Review Comments
+
+Reply **in the comment thread** (not top-level):
+
+**IMPORTANT: Always start with `@gemini-code-assist` so they are notified of your response.**
+
+```bash
+gh api repos/davidshaevel-dot-com/davidshaevel-portainer/pulls/<PR>/comments/<COMMENT_ID>/replies \
+  -f body="@gemini-code-assist Fixed. Changed X to Y."
+```
+
+Every inline reply must include:
+- **`@gemini-code-assist` at the start** (required for notification)
+- What was fixed and how
+- Technical reasoning if declining
+
+#### Post Summary Comment
+
+Add a summary comment to the PR:
+
+**IMPORTANT: Always start with `@gemini-code-assist` so they are notified.**
+
+```markdown
+@gemini-code-assist Review addressed:
+
+| # | Feedback | Resolution |
+|---|----------|------------|
+| 1 | Issue X | Fixed in abc123 - Added validation for edge case |
+| 2 | Issue Y | Fixed in abc123 - Refactored to use recommended pattern |
+| 3 | Issue Z | Declined - YAGNI, feature not currently used |
+```
+
+**Resolution column format:** Include both the commit reference AND a brief summary of how the feedback was addressed.
 
 ---
 
