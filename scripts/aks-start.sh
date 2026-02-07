@@ -12,3 +12,8 @@ az aks start \
     --name "${CLUSTER_NAME}"
 
 echo "Cluster '${CLUSTER_NAME}' started."
+echo ""
+echo "Next steps:"
+echo "  1. Run ./scripts/teleport-dns.sh to update DNS (LoadBalancer IP may have changed)"
+echo "  2. Wait a few minutes for DNS propagation and TLS certificate renewal"
+echo "  3. Verify access at https://teleport.davidshaevel.com"
