@@ -311,9 +311,10 @@ davidshaevel-portainer/
 │   ├── .envrc                         # Environment variables (gitignored)
 │   ├── .envrc.example                 # Template for .envrc (committed)
 │   ├── .gitignore                     # Git ignore patterns
-│   ├── scripts/                       # Reusable az/kubectl scripts
+│   ├── scripts/                       # Reusable az/kubectl/helm scripts
 │   └── docs/                          # Documentation
-│       └── agendas/                   # Work session agendas
+│       ├── agendas/                   # Work session agendas
+│       └── plans/                     # Design documents and plans
 │
 └── <feature-worktrees>/               # Feature branch worktrees (flat!)
 ```
