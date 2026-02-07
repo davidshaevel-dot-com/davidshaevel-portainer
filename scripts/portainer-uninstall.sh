@@ -16,7 +16,7 @@ fi
 
 echo "Uninstalling Portainer..."
 if helm status portainer -n portainer >/dev/null 2>&1; then
-    helm uninstall portainer -n portainer
+    helm uninstall portainer -n portainer --wait
 else
     echo "Portainer Helm release not found, skipping uninstall."
 fi
