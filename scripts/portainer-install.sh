@@ -17,7 +17,7 @@ echo "  Edition:      Business (Enterprise)"
 echo "  Image tag:    lts"
 echo ""
 
-helm upgrade --install --create-namespace -n portainer portainer portainer/portainer \
+helm upgrade --install --create-namespace --wait -n portainer portainer portainer/portainer \
     --set service.type=LoadBalancer \
     --set tls.force=true \
     --set enterpriseEdition.enabled=true \

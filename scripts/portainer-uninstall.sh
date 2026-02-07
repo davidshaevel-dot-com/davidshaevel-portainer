@@ -15,11 +15,15 @@ if [ "${confirm}" != "portainer" ]; then
 fi
 
 echo "Uninstalling Portainer..."
-helm uninstall portainer -n portainer
+if helm status portainer -n portainer >/dev/null 2>&1; then
+    helm uninstall portainer -n portainer
+else
+    echo "Portainer Helm release not found, skipping uninstall."
+fi
 
 echo ""
 echo "Deleting namespace 'portainer'..."
-kubectl delete namespace portainer
+kubectl delete namespace portainer --ignore-not-found=true
 
 echo ""
 echo "Portainer uninstalled."

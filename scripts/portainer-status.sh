@@ -4,8 +4,14 @@
 source "$(dirname "$0")/config.sh"
 setup_logging "portainer-status"
 
+if ! helm status portainer -n portainer >/dev/null 2>&1; then
+    echo "Portainer Helm release 'portainer' not found in namespace 'portainer'."
+    echo "Run ./scripts/portainer-install.sh to install it."
+    exit 0
+fi
+
 echo "=== Helm Release ==="
-helm status portainer -n portainer 2>/dev/null || echo "Portainer not installed via Helm."
+helm status portainer -n portainer
 
 echo ""
 echo "=== Pods ==="
@@ -17,7 +23,7 @@ kubectl get svc -n portainer
 
 echo ""
 echo "=== Access URL ==="
-EXTERNAL_IP=$(kubectl get svc portainer -n portainer -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null)
+EXTERNAL_IP=$(kubectl get svc portainer -n portainer -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || true)
 if [ -n "${EXTERNAL_IP}" ]; then
     echo "  https://${EXTERNAL_IP}:9443/"
 else
