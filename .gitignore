@@ -1,0 +1,58 @@
+# Environment variables
+.env
+.env.*
+.env.local
+.env.*.local
+*.env
+.envrc
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Terraform
+**/.terraform/
+**/.terraform.lock.hcl
+**/terraform.tfstate
+**/terraform.tfstate.*
+**/terraform.tfstate.backup
+**/terraform.tfvars
+**/*.tfvars
+**/terraform.tfvars.*
+!**/terraform.tfvars.example
+**/.terraformrc
+**/crash.log
+**/override.tf
+**/override.tf.json
+**/*_override.tf
+**/*_override.tf.json
+**/*.tfplan
+**/tfplan
+**/tfplan.binary
+
+# Kubernetes
+kubeconfig
+*.kubeconfig
+
+# Secrets
+secrets/
+*.pem
+*.key
+*.crt
+
+# Logs
+logs/
+*.log
+
+# Misc
+.cache/
+temp/
+tmp/
+
+# Claude Code context files
+.claude/
+CLAUDE.local.md
