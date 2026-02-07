@@ -36,19 +36,8 @@ kubectl get svc -n portainer
 
 echo ""
 echo "Waiting for LoadBalancer external IP (this may take a few minutes)..."
-EXTERNAL_IP=""
-ATTEMPTS=0
-MAX_ATTEMPTS=36  # 3 minutes (36 * 5 seconds)
-while [ -z "${EXTERNAL_IP}" ] && [ "${ATTEMPTS}" -lt "${MAX_ATTEMPTS}" ]; do
-    EXTERNAL_IP=$(kubectl get svc portainer -n portainer -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || true)
-    if [ -z "${EXTERNAL_IP}" ]; then
-        echo -n "."
-        sleep 5
-        ATTEMPTS=$((ATTEMPTS + 1))
-    fi
-done
-echo ""
-if [ -n "${EXTERNAL_IP}" ]; then
+if kubectl wait -n portainer --for=jsonpath='{.status.loadBalancer.ingress}' service/portainer --timeout=3m; then
+    EXTERNAL_IP=$(kubectl get svc portainer -n portainer -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
     echo "Portainer is available at: https://${EXTERNAL_IP}:9443/"
 else
     echo "LoadBalancer IP not assigned after 3 minutes."
