@@ -16,7 +16,7 @@ AKS Cluster (portainer-rg, eastus)
     +-- teleport-cluster namespace
     |       |
     |       +-- Teleport Proxy (HTTPS, LoadBalancer)
-    |       |       Web UI:   https://teleport.davidshaevel.com
+    |       |       Web UI:   https://teleport.<your-domain>.com
     |       |       App Proxy: routes to Portainer (ClusterIP)
     |       |       K8s Proxy: authenticated kubectl access
     |       |
@@ -93,6 +93,8 @@ All traffic flows through Teleport. Portainer has no public endpoint.
    ./scripts/teleport-install.sh
    ./scripts/teleport-dns.sh
    ```
+
+   Wait a few minutes for DNS propagation and TLS certificate issuance, then verify `https://<your-teleport-domain>` is accessible before continuing.
 
 6. **Deploy the Teleport agent** (registers Portainer app and Kubernetes cluster):
 
