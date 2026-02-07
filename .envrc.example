@@ -7,3 +7,14 @@
 
 # Azure subscription name or ID used by all az CLI commands.
 export AZURE_SUBSCRIPTION="Your Azure Subscription Name"
+
+# Cloudflare API credentials for DNS record management (teleport.davidshaevel.com).
+# Create an API token at: https://dash.cloudflare.com/profile/api-tokens
+# Required permissions: Zone:DNS:Edit scoped to davidshaevel.com
+export CLOUDFLARE_API_TOKEN="Your Cloudflare API Token"
+
+# Zone ID found on the davidshaevel.com overview page in Cloudflare dashboard.
+export CLOUDFLARE_ZONE_ID="Your Cloudflare Zone ID"
+
+# Email address for Let's Encrypt ACME certificate notifications (Teleport TLS).
+export TELEPORT_ACME_EMAIL="your-email@example.com"
