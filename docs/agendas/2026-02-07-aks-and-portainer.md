@@ -84,15 +84,26 @@ Following [Portainer BE Install Docs](https://docs.portainer.io/start/install/se
 - [ ] Explore cluster resources through the Portainer UI
 - [ ] Deploy a sample application through Portainer (optional)
 
-### 4. Document & Commit
+### 4. Secure Access with Teleport (TT-141)
+
+Following [Teleport Kubernetes Access](https://goteleport.com/docs/kubernetes-access/) and [Teleport Application Access](https://goteleport.com/docs/application-access/):
+
+- [ ] Install Teleport on the AKS cluster (Helm chart)
+- [ ] Configure Teleport Kubernetes agent for cluster access
+- [ ] Register Portainer as a Teleport application (proxy to `https://portainer-svc:9443`)
+- [ ] Switch Portainer service from LoadBalancer to ClusterIP (remove public exposure)
+- [ ] Configure Teleport users/roles
+- [ ] Update scripts and documentation
+
+### 5. Document & Commit
 
 - [ ] Update CLAUDE.md with any architecture changes
 - [ ] Update CLAUDE.local.md session notes with what was accomplished
 - [ ] Update learning path progress table in CLAUDE.md
 - [ ] Commit and push all changes
-- [ ] Update Linear issues (TT-138, TT-139, TT-140) with completion status
+- [ ] Update Linear issues (TT-138, TT-139, TT-140, TT-141) with completion status
 
-### 5. Cost Awareness
+### 6. Cost Awareness
 
 **Remember to stop the cluster when done for the day:**
 ```bash
@@ -111,4 +122,6 @@ az aks start --resource-group portainer-rg --name portainer-aks
 - [Portainer BE Install Docs (K8s Baremetal)](https://docs.portainer.io/start/install/server/kubernetes/baremetal)
 - [Azure AKS Quickstart](https://learn.microsoft.com/en-us/azure/aks/learn/quick-kubernetes-deploy-cli)
 - [AKS Start/Stop Cluster](https://learn.microsoft.com/en-us/azure/aks/start-stop-cluster)
+- [Teleport Kubernetes Access](https://goteleport.com/docs/kubernetes-access/)
+- [Teleport Application Access](https://goteleport.com/docs/application-access/)
 - Previous agenda: `docs/agendas/2026-02-06-project-setup.md`
