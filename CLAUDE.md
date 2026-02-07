@@ -108,17 +108,56 @@ related-issues: TT-XXX
 **CRITICAL: NEVER MERGE WITHOUT CODE REVIEW**
 
 1. **Create PR** with descriptive title and comprehensive description
-2. **Wait for review**
-3. **Address feedback** before merging
-4. **Merge Strategy:** Always use **Squash and Merge**
+2. **Wait for review** (Gemini Code Assist or human reviewer)
+3. **Address feedback:**
+   - CRITICAL and HIGH issues: Must fix
+   - MEDIUM issues: Evaluate and decide
+4. **Post summary comment** with all fixes addressed
+5. **Merge only after** all review feedback resolved
+
+**Merge Strategy:** Always use **Squash and Merge** for pull requests.
 
 ```bash
 # Merge PR with squash
 gh pr merge <PR_NUMBER> --squash
 
-# Delete the remote branch
+# Delete the remote branch (--delete-branch doesn't work with worktrees)
 git push origin --delete <branch-name>
 ```
+
+#### Reply to Review Comments
+
+Reply **in the comment thread** (not top-level):
+
+**IMPORTANT: Always start with `@gemini-code-assist` so they are notified of your response.**
+
+```bash
+gh api repos/davidshaevel-dot-com/davidshaevel-portainer/pulls/<PR>/comments/<COMMENT_ID>/replies \
+  -f body="@gemini-code-assist Fixed. Changed X to Y."
+```
+
+Every inline reply must include:
+- **`@gemini-code-assist` at the start** (required for notification)
+- What was fixed and how
+- Technical reasoning if declining
+
+#### Post Summary Comment
+
+Add a summary comment to the PR:
+
+**IMPORTANT: Always start with `@gemini-code-assist` so they are notified.**
+
+```markdown
+@gemini-code-assist Review addressed:
+
+| # | Feedback | Resolution |
+|---|----------|------------|
+| 1 | Issue X | Fixed in abc123 - Added validation for edge case |
+| 2 | Issue Y | Fixed in abc123 - Refactored to use recommended pattern |
+| 3 | Issue Z | Declined - YAGNI, feature not currently used |
+```
+
+**Resolution column format:** Include both the commit reference AND a brief summary of how the feedback was addressed.
 
 ---
 
@@ -181,6 +220,51 @@ git worktree remove <worktree-name>
 
 ---
 
+## Script Execution & Logging
+
+All scripts and `az` CLI commands should tee output to `/tmp/${USER}-portainer/` so David can `tail -f` from a separate terminal.
+
+**For scripts:** Each script calls `setup_logging "script-name"` (from `scripts/config.sh`) which tees all output to `/tmp/${USER}-portainer/<script-name>.log`.
+
+**For ad-hoc az/kubectl commands run by Claude Code:** Pipe through tee:
+```bash
+az aks show ... 2>&1 | tee /tmp/${USER}-portainer/ad-hoc.log
+```
+
+**Tailing from a separate terminal:**
+```bash
+tail -f /tmp/${USER}-portainer/aks-create.log
+```
+
+---
+
+## Environment Variables
+
+Environment-specific values are stored in `.envrc` (gitignored). A committed `.envrc.example` documents the required variables.
+
+**Setup:**
+```bash
+cp .envrc.example .envrc
+# Edit .envrc with your values
+```
+
+**With direnv:** `.envrc` is auto-sourced when you `cd` into the project.
+
+**Without direnv:** Source manually before running scripts:
+```bash
+source .envrc
+```
+
+**Current variables:**
+
+| Variable | Used By | Purpose |
+|----------|---------|---------|
+| `AZURE_SUBSCRIPTION` | `scripts/config.sh` | Azure subscription name or ID for all `az` commands |
+
+Scripts will error with a clear message if a required env var is missing.
+
+---
+
 ## Key Conventions Summary
 
 - **Always use feature branches** named `claude/<issue>-<description>` or `david/<issue>-<description>`
@@ -204,7 +288,10 @@ davidshaevel-portainer/
 ├── main/                              # Main branch worktree
 │   ├── CLAUDE.md                      # Public project context (this file)
 │   ├── CLAUDE.local.md                # Sensitive project context (gitignored)
+│   ├── .envrc                         # Environment variables (gitignored)
+│   ├── .envrc.example                 # Template for .envrc (committed)
 │   ├── .gitignore                     # Git ignore patterns
+│   ├── scripts/                       # Reusable az/kubectl scripts
 │   └── docs/                          # Documentation
 │       └── agendas/                   # Work session agendas
 │

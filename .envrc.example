@@ -1,0 +1,9 @@
+# Environment variables for davidshaevel-portainer scripts.
+# Copy this file to .envrc and fill in your values:
+#   cp .envrc.example .envrc
+#
+# If using direnv, it will auto-source .envrc when you cd into the project.
+# Otherwise, source manually: source .envrc
+
+# Azure subscription name or ID used by all az CLI commands.
+export AZURE_SUBSCRIPTION="Your Azure Subscription Name"
