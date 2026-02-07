@@ -10,8 +10,10 @@ This is a hands-on learning project for getting practical experience with Kubern
 - **Cloud:** Azure (AKS, Resource Groups)
 - **Container Orchestration:** Kubernetes
 - **Platform Management:** Portainer Business Edition (BE)
+- **Secure Access:** Teleport Community Edition (self-hosted)
 - **IaC:** Azure CLI, Helm
-- **CLI Tools:** kubectl, helm, az
+- **DNS:** Cloudflare (API-managed)
+- **CLI Tools:** kubectl, helm, az, tsh, tctl
 
 **Project Management:**
 - **Issue Tracking:** Linear (Team Tacocat)
@@ -40,16 +42,25 @@ If there's even a 1% chance a skill applies, invoke it.
 Internet
     │
     ▼
-Azure Load Balancer
+Azure Load Balancer (Teleport)
     │
     ▼
 AKS Cluster (portainer-rg)
     │
+    ├── teleport-cluster namespace
+    │       │
+    │       ├── Teleport Auth (ClusterIP)
+    │       ├── Teleport Proxy (port 443 HTTPS, LoadBalancer)
+    │       │       +-- Web UI:   https://teleport.davidshaevel.com
+    │       │       +-- App Proxy: routes to Portainer (ClusterIP)
+    │       │       +-- K8s Proxy: authenticated kubectl access
+    │       └── Teleport Agent (app + kube registration)
+    │
     ├── portainer namespace
     │       │
     │       ▼
-    │   Portainer BE (port 9443 HTTPS)
-    │       │
+    │   Portainer BE (ClusterIP, port 9443 HTTPS)
+    │       │  (no public IP, accessed via Teleport)
     │       ▼
     │   Persistent Volume (default StorageClass)
     │
@@ -184,7 +195,7 @@ helm upgrade --install --create-namespace -n portainer portainer portainer/porta
 ```
 
 ### Access
-- **Load Balancer:** `https://<loadbalancer-IP>:9443/`
+- **Via Teleport:** `https://teleport.davidshaevel.com` (Portainer app in sidebar)
 
 ---
 
@@ -204,13 +215,19 @@ az aks list --resource-group portainer-rg --output table
 kubectl get nodes
 kubectl get sc                    # Check StorageClass
 kubectl get all -n portainer      # Check Portainer resources
-kubectl get svc -n portainer      # Get Portainer service IP
+kubectl get all -n teleport-cluster  # Check Teleport resources
 
 # Helm
-helm repo add portainer https://portainer.github.io/k8s/
-helm repo update
-helm list -n portainer
+helm list -A                       # All Helm releases
 helm status portainer -n portainer
+helm status teleport-cluster -n teleport-cluster
+helm status teleport-agent -n teleport-cluster
+
+# Teleport (via auth pod)
+kubectl exec -n teleport-cluster deployment/teleport-cluster-auth -- tctl status
+kubectl exec -n teleport-cluster deployment/teleport-cluster-auth -- tctl users ls
+kubectl exec -n teleport-cluster deployment/teleport-cluster-auth -- tctl apps ls
+kubectl exec -n teleport-cluster deployment/teleport-cluster-auth -- tctl kube ls
 
 # Git worktrees
 git worktree list
@@ -260,6 +277,8 @@ source .envrc
 | Variable | Used By | Purpose |
 |----------|---------|---------|
 | `AZURE_SUBSCRIPTION` | `scripts/config.sh` | Azure subscription name or ID for all `az` commands |
+| `CLOUDFLARE_API_TOKEN` | `scripts/teleport-dns.sh` | Cloudflare API token with DNS edit permissions |
+| `CLOUDFLARE_ZONE_ID` | `scripts/teleport-dns.sh` | Cloudflare zone ID for davidshaevel.com |
 
 Scripts will error with a clear message if a required env var is missing.
 
@@ -352,3 +371,7 @@ cp <worktree-name>/CLAUDE.local.md main/CLAUDE.local.md
 - **Learning Path:** [Build Your First Kubernetes Developer Platform](https://rawkode.academy/learning-paths/build-your-first-kubernetes-developer-platform)
 - **Portainer BE Install Docs:** [Kubernetes Baremetal](https://docs.portainer.io/start/install/server/kubernetes/baremetal)
 - **Azure AKS Docs:** [Azure Kubernetes Service](https://learn.microsoft.com/en-us/azure/aks/)
+- **Teleport Helm Deploy:** [Deploy on Kubernetes](https://goteleport.com/docs/deploy-a-cluster/helm-deployments/kubernetes-cluster/)
+- **Teleport App Access:** [Application Access](https://goteleport.com/docs/application-access/)
+- **Teleport K8s Access:** [Kubernetes Access](https://goteleport.com/docs/kubernetes-access/)
+- **Cloudflare DNS API:** [DNS Records](https://developers.cloudflare.com/api/resources/dns/subresources/records/)
