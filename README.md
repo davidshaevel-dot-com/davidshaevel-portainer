@@ -180,4 +180,4 @@ Stop the cluster when not in use to save costs: `./scripts/aks-stop.sh`
 
 ## License
 
-This is a personal learning project. Scripts and configuration are provided as-is.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
