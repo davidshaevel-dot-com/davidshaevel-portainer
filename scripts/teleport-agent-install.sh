@@ -45,10 +45,8 @@ echo ""
 echo "Switching Portainer service to ClusterIP (removing public IP)..."
 helm upgrade portainer portainer/portainer \
     -n portainer \
+    --reuse-values \
     --set service.type=ClusterIP \
-    --set tls.force=true \
-    --set enterpriseEdition.enabled=true \
-    --set image.tag=lts \
     --wait
 
 echo ""

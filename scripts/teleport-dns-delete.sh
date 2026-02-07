@@ -14,56 +14,46 @@ CF_API="https://api.cloudflare.com/client/v4"
 ZONE_ID="${CLOUDFLARE_ZONE_ID:?Set CLOUDFLARE_ZONE_ID in .envrc or environment}"
 API_TOKEN="${CLOUDFLARE_API_TOKEN:?Set CLOUDFLARE_API_TOKEN in .envrc or environment}"
 
-# Look up and display existing records.
+# Look up existing records and store IDs for later deletion.
 echo "Looking up DNS records for Teleport..."
-FOUND=0
+RECORD_IDS=()
+RECORD_NAMES=()
 for name in "${DOMAIN}" "${WILDCARD_DOMAIN}"; do
     EXISTING=$(curl -s -X GET "${CF_API}/zones/${ZONE_ID}/dns_records?name=${name}&type=A" \
         -H "Authorization: Bearer ${API_TOKEN}" \
         -H "Content-Type: application/json")
-    RECORD_IP=$(echo "${EXISTING}" | jq -r '.result[0].content // empty')
-    if [ -n "${RECORD_IP}" ]; then
-        echo "  ${name} -> ${RECORD_IP}"
-        FOUND=$((FOUND + 1))
+
+    RECORD_ID=$(echo "${EXISTING}" | jq -r '.result[0].id // empty')
+    if [ -n "${RECORD_ID}" ]; then
+        RECORD_IP=$(echo "${EXISTING}" | jq -r '.result[0].content')
+        echo "  Found: ${name} -> ${RECORD_IP} (ID: ${RECORD_ID})"
+        RECORD_IDS+=("${RECORD_ID}")
+        RECORD_NAMES+=("${name}")
     fi
 done
 
-if [ "${FOUND}" -eq 0 ]; then
+if [ ${#RECORD_IDS[@]} -eq 0 ]; then
     echo "No DNS records found for Teleport. Nothing to delete."
     exit 0
 fi
 
 echo ""
-read -r -p "Type 'delete' to confirm deletion of ${FOUND} record(s): " confirm
+read -r -p "Type 'delete' to confirm deletion of ${#RECORD_IDS[@]} record(s): " confirm
 if [ "${confirm}" != "delete" ]; then
     echo "Confirmation failed. Aborting."
     exit 1
 fi
 
-# Delete each record.
-# Usage: delete_record <record_name>
-delete_record() {
-    local record_name="${1}"
+# Delete records using stored IDs (no redundant lookups).
+echo "Deleting DNS records..."
+for i in "${!RECORD_IDS[@]}"; do
+    record_id="${RECORD_IDS[$i]}"
+    record_name="${RECORD_NAMES[$i]}"
 
-    local existing
-    existing=$(curl -s -X GET "${CF_API}/zones/${ZONE_ID}/dns_records?name=${record_name}&type=A" \
-        -H "Authorization: Bearer ${API_TOKEN}" \
-        -H "Content-Type: application/json")
-
-    local record_id
-    record_id=$(echo "${existing}" | jq -r '.result[0].id // empty')
-
-    if [ -z "${record_id}" ]; then
-        echo "  ${record_name}: not found, skipping."
-        return
-    fi
-
-    local result
     result=$(curl -s -X DELETE "${CF_API}/zones/${ZONE_ID}/dns_records/${record_id}" \
         -H "Authorization: Bearer ${API_TOKEN}" \
         -H "Content-Type: application/json")
 
-    local success
     success=$(echo "${result}" | jq -r '.success')
     if [ "${success}" = "true" ]; then
         echo "  ${record_name}: deleted."
@@ -72,10 +62,7 @@ delete_record() {
         echo "${result}" | jq '.errors'
         exit 1
     fi
-}
+done
 
-echo "Deleting DNS records..."
-delete_record "${DOMAIN}"
-delete_record "${WILDCARD_DOMAIN}"
 echo ""
 echo "All Teleport DNS records deleted."

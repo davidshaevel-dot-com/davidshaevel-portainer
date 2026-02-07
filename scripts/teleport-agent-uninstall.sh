@@ -27,10 +27,8 @@ echo ""
 echo "Restoring Portainer to LoadBalancer..."
 helm upgrade portainer portainer/portainer \
     -n portainer \
+    --reuse-values \
     --set service.type=LoadBalancer \
-    --set tls.force=true \
-    --set enterpriseEdition.enabled=true \
-    --set image.tag=lts \
     --wait
 
 echo ""
