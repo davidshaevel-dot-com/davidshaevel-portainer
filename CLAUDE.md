@@ -222,9 +222,9 @@ git worktree remove <worktree-name>
 
 ## Script Execution & Logging
 
-All scripts and `az` CLI commands should tee output to `/tmp/$USER-portainer/` so David can `tail -f` from a separate terminal.
+All scripts and `az` CLI commands should tee output to `/tmp/${USER}-portainer/` so David can `tail -f` from a separate terminal.
 
-**For scripts:** Each script calls `setup_logging "script-name"` (from `scripts/config.sh`) which tees all output to `/tmp/$USER-portainer/<script-name>.log`.
+**For scripts:** Each script calls `setup_logging "script-name"` (from `scripts/config.sh`) which tees all output to `/tmp/${USER}-portainer/<script-name>.log`.
 
 **For ad-hoc az/kubectl commands run by Claude Code:** Pipe through tee:
 ```bash
@@ -235,6 +235,33 @@ az aks show ... 2>&1 | tee /tmp/${USER}-portainer/ad-hoc.log
 ```bash
 tail -f /tmp/${USER}-portainer/aks-create.log
 ```
+
+---
+
+## Environment Variables
+
+Environment-specific values are stored in `.envrc` (gitignored). A committed `.envrc.example` documents the required variables.
+
+**Setup:**
+```bash
+cp .envrc.example .envrc
+# Edit .envrc with your values
+```
+
+**With direnv:** `.envrc` is auto-sourced when you `cd` into the project.
+
+**Without direnv:** Source manually before running scripts:
+```bash
+source .envrc
+```
+
+**Current variables:**
+
+| Variable | Used By | Purpose |
+|----------|---------|---------|
+| `AZURE_SUBSCRIPTION` | `scripts/config.sh` | Azure subscription name or ID for all `az` commands |
+
+Scripts will error with a clear message if a required env var is missing.
 
 ---
 
@@ -261,7 +288,10 @@ davidshaevel-portainer/
 ├── main/                              # Main branch worktree
 │   ├── CLAUDE.md                      # Public project context (this file)
 │   ├── CLAUDE.local.md                # Sensitive project context (gitignored)
+│   ├── .envrc                         # Environment variables (gitignored)
+│   ├── .envrc.example                 # Template for .envrc (committed)
 │   ├── .gitignore                     # Git ignore patterns
+│   ├── scripts/                       # Reusable az/kubectl scripts
 │   └── docs/                          # Documentation
 │       └── agendas/                   # Work session agendas
 │

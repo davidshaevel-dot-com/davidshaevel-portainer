@@ -9,7 +9,7 @@ CLUSTER_NAME="portainer-aks"
 LOCATION="eastus"
 NODE_COUNT=1
 NODE_VM_SIZE="Standard_B2s"
-SUBSCRIPTION="DavidShaevel.com Subscription Two"
+SUBSCRIPTION="${AZURE_SUBSCRIPTION:?Set AZURE_SUBSCRIPTION in .envrc or environment}"
 
 # Log directory for tailing script output from a separate terminal.
 LOG_DIR="/tmp/${USER}-portainer"
