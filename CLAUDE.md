@@ -181,6 +181,24 @@ git worktree remove <worktree-name>
 
 ---
 
+## Script Execution & Logging
+
+All scripts and `az` CLI commands should tee output to `/tmp/davidshaevel-portainer/` so David can `tail -f` from a separate terminal.
+
+**For scripts:** Each script calls `setup_logging "script-name"` (from `scripts/config.sh`) which tees all output to `/tmp/davidshaevel-portainer/<script-name>.log`.
+
+**For ad-hoc az/kubectl commands run by Claude Code:** Pipe through tee:
+```bash
+az aks show ... 2>&1 | tee /tmp/davidshaevel-portainer/ad-hoc.log
+```
+
+**Tailing from a separate terminal:**
+```bash
+tail -f /tmp/davidshaevel-portainer/aks-create.log
+```
+
+---
+
 ## Key Conventions Summary
 
 - **Always use feature branches** named `claude/<issue>-<description>` or `david/<issue>-<description>`
