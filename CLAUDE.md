@@ -279,6 +279,7 @@ source .envrc
 | `AZURE_SUBSCRIPTION` | `scripts/config.sh` | Azure subscription name or ID for all `az` commands |
 | `CLOUDFLARE_API_TOKEN` | `scripts/teleport-dns.sh` | Cloudflare API token with DNS edit permissions |
 | `CLOUDFLARE_ZONE_ID` | `scripts/teleport-dns.sh` | Cloudflare zone ID for davidshaevel.com |
+| `TELEPORT_ACME_EMAIL` | `scripts/teleport-install.sh` | Email for Let's Encrypt ACME certificate notifications |
 
 Scripts will error with a clear message if a required env var is missing.
 

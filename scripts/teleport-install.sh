@@ -7,6 +7,7 @@ setup_logging "teleport-install"
 
 TELEPORT_DOMAIN="teleport.davidshaevel.com"
 TELEPORT_NAMESPACE="teleport-cluster"
+TELEPORT_ACME_EMAIL="${TELEPORT_ACME_EMAIL:?Set TELEPORT_ACME_EMAIL in .envrc or environment}"
 
 echo "Adding Teleport Helm repository..."
 helm repo add teleport https://charts.releases.teleport.dev
@@ -28,7 +29,7 @@ helm upgrade --install --wait -n "${TELEPORT_NAMESPACE}" teleport-cluster telepo
     --set clusterName="${TELEPORT_DOMAIN}" \
     --set proxyListenerMode=multiplex \
     --set acme=true \
-    --set acmeEmail=admin@davidshaevel.com
+    --set acmeEmail="${TELEPORT_ACME_EMAIL}"
 
 echo ""
 echo "Teleport installed. Checking deployment status..."

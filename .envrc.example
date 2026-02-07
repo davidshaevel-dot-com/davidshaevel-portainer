@@ -15,3 +15,6 @@ export CLOUDFLARE_API_TOKEN="Your Cloudflare API Token"
 
 # Zone ID found on the davidshaevel.com overview page in Cloudflare dashboard.
 export CLOUDFLARE_ZONE_ID="Your Cloudflare Zone ID"
+
+# Email address for Let's Encrypt ACME certificate notifications (Teleport TLS).
+export TELEPORT_ACME_EMAIL="your-email@example.com"
