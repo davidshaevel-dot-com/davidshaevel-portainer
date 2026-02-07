@@ -7,7 +7,7 @@ setup_logging "portainer-uninstall"
 echo "WARNING: This will uninstall Portainer from the cluster."
 echo "All Portainer data will be lost."
 echo ""
-read -p "Type 'portainer' to confirm uninstall: " confirm
+read -r -p "Type 'portainer' to confirm uninstall: " confirm
 
 if [ "${confirm}" != "portainer" ]; then
     echo "Confirmation failed. Aborting."
