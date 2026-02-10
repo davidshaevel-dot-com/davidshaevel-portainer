@@ -15,7 +15,7 @@ fi
 
 echo "Uninstalling Portainer Agent from GKE cluster '${GKE_CLUSTER_NAME}'..."
 
-kubectl delete -f https://downloads.portainer.io/ee2-21/portainer-agent-k8s-lb.yaml --ignore-not-found=true
+kubectl delete -f "${PORTAINER_AGENT_MANIFEST}" --ignore-not-found=true
 
 echo ""
 echo "Portainer Agent uninstalled from GKE."

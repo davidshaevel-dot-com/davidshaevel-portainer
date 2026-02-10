@@ -15,8 +15,7 @@ az aks get-credentials \
     --subscription "${SUBSCRIPTION}" \
     --resource-group "${RESOURCE_GROUP}" \
     --name "${AKS_CLUSTER_NAME}" \
-    --overwrite-existing \
-    2>/dev/null
+    --overwrite-existing
 
 # Verify Teleport is installed on AKS.
 if ! helm status teleport-cluster -n "${TELEPORT_NAMESPACE}" >/dev/null 2>&1; then
@@ -72,8 +71,7 @@ az aks get-credentials \
     --subscription "${SUBSCRIPTION}" \
     --resource-group "${RESOURCE_GROUP}" \
     --name "${AKS_CLUSTER_NAME}" \
-    --overwrite-existing \
-    2>/dev/null
+    --overwrite-existing
 
 echo ""
 echo "Registered kube clusters:"

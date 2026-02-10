@@ -19,6 +19,9 @@ GKE_ZONE="us-central1-a"
 GKE_MACHINE_TYPE="e2-medium"
 GKE_NODE_COUNT=1
 
+# --- Portainer Agent ---
+PORTAINER_AGENT_MANIFEST="https://downloads.portainer.io/ee2-21/portainer-agent-k8s-lb.yaml"
+
 # Log directory for tailing script output from a separate terminal.
 LOG_DIR="/tmp/${USER}-portainer"
 mkdir -p "${LOG_DIR}"

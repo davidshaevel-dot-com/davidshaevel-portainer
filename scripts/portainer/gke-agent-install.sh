@@ -18,7 +18,7 @@ fi
 echo "Installing Portainer Agent on GKE cluster '${GKE_CLUSTER_NAME}'..."
 echo ""
 
-kubectl apply -f https://downloads.portainer.io/ee2-21/portainer-agent-k8s-lb.yaml
+kubectl apply -f "${PORTAINER_AGENT_MANIFEST}"
 
 # Restrict the LoadBalancer to accept traffic only from the AKS egress IP.
 # GKE auto-creates firewall rules for LoadBalancer services that allow 0.0.0.0/0.
