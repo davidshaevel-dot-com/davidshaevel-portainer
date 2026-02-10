@@ -144,9 +144,9 @@ All scripts source `scripts/config.sh` for shared configuration and log output t
 | Script | Description |
 |--------|-------------|
 | `gke/create.sh` | Create the GKE cluster (enables API if needed) |
-| `gke/delete.sh` | Delete the GKE cluster |
+| `gke/delete.sh` | Delete the GKE cluster (interactive, requires confirmation) |
 | `gke/start.sh` | Orchestrated rebuild (create + agents) |
-| `gke/stop.sh` | Delete the GKE cluster (GKE has no stop/start) |
+| `gke/stop.sh` | Delete the GKE cluster (non-interactive, for scripted use) |
 | `gke/status.sh` | Show cluster status |
 | `gke/credentials.sh` | Fetch kubeconfig credentials |
 
@@ -215,7 +215,7 @@ Following the [Rawkode Academy learning path](https://rawkode.academy/learning-p
 | GKE Autopilot/Standard (e2-medium) | ~$25 |
 | **Total** | **~$75-80** |
 
-Stop AKS when not in use: `./scripts/aks/stop.sh`. Delete GKE when not in use: `./scripts/gke/delete.sh` (GKE has no stop/start — use `./scripts/gke/start.sh` to rebuild).
+Stop AKS when not in use: `./scripts/aks/stop.sh`. Delete GKE when not in use: `./scripts/gke/stop.sh` (GKE has no stop/start — use `./scripts/gke/start.sh` to rebuild).
 
 ## License
 
