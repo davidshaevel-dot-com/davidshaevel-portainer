@@ -2,7 +2,7 @@
 # Deploy teleport-kube-agent to register Portainer app and Kubernetes cluster with Teleport.
 # This creates a join token, installs the agent via Helm, and switches Portainer to ClusterIP.
 
-source "$(dirname "$0")/config.sh"
+source "$(dirname "$0")/../config.sh"
 setup_logging "teleport-agent-install"
 
 TELEPORT_NAMESPACE="teleport-cluster"
@@ -10,7 +10,7 @@ TELEPORT_DOMAIN="teleport.davidshaevel.com"
 
 # Verify Teleport is installed.
 if ! helm status teleport-cluster -n "${TELEPORT_NAMESPACE}" >/dev/null 2>&1; then
-    echo "Error: Teleport cluster not found. Run ./scripts/teleport-install.sh first."
+    echo "Error: Teleport cluster not found. Run ./scripts/teleport/install.sh first."
     exit 1
 fi
 
@@ -27,7 +27,7 @@ echo "Teleport version: ${TELEPORT_VERSION}"
 echo ""
 echo "Installing teleport-kube-agent..."
 echo "  Proxy:          ${TELEPORT_DOMAIN}:443"
-echo "  Kube cluster:   ${CLUSTER_NAME}"
+echo "  Kube cluster:   ${AKS_CLUSTER_NAME}"
 echo "  App:            portainer -> https://portainer.portainer.svc.cluster.local:9443"
 echo ""
 
@@ -35,7 +35,7 @@ helm upgrade --install --wait -n "${TELEPORT_NAMESPACE}" teleport-agent teleport
     --set roles="app\,kube" \
     --set proxyAddr="${TELEPORT_DOMAIN}:443" \
     --set authToken="${TOKEN}" \
-    --set kubeClusterName="${CLUSTER_NAME}" \
+    --set kubeClusterName="${AKS_CLUSTER_NAME}" \
     --set "apps[0].name=portainer" \
     --set "apps[0].uri=https://portainer.portainer.svc.cluster.local:9443" \
     --set "apps[0].insecure_skip_verify=true" \

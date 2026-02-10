@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 # Fetch AKS cluster credentials and configure kubectl.
 
-source "$(dirname "$0")/config.sh"
+source "$(dirname "$0")/../config.sh"
 setup_logging "aks-credentials"
 
-echo "Fetching credentials for cluster '${CLUSTER_NAME}'..."
+echo "Fetching credentials for cluster '${AKS_CLUSTER_NAME}'..."
 
 az aks get-credentials \
     --subscription "${SUBSCRIPTION}" \
     --resource-group "${RESOURCE_GROUP}" \
-    --name "${CLUSTER_NAME}" \
+    --name "${AKS_CLUSTER_NAME}" \
     --overwrite-existing
 
 echo ""

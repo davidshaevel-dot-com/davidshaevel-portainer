@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Uninstall the teleport-kube-agent and restore Portainer's public LoadBalancer.
 
-source "$(dirname "$0")/config.sh"
+source "$(dirname "$0")/../config.sh"
 setup_logging "teleport-agent-uninstall"
 
 TELEPORT_NAMESPACE="teleport-cluster"

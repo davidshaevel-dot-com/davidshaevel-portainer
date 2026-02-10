@@ -7,13 +7,13 @@
 This is a hands-on learning project for getting practical experience with Kubernetes and Portainer. The project follows the [Build Your First Kubernetes Developer Platform](https://rawkode.academy/learning-paths/build-your-first-kubernetes-developer-platform) learning path from Rawkode Academy, starting with Portainer installation on an Azure Kubernetes Service (AKS) cluster.
 
 **Key Technologies:**
-- **Cloud:** Azure (AKS, Resource Groups)
-- **Container Orchestration:** Kubernetes
+- **Cloud:** Azure (AKS), Google Cloud (GKE)
+- **Container Orchestration:** Kubernetes (multi-cluster)
 - **Platform Management:** Portainer Business Edition (BE)
 - **Secure Access:** Teleport Community Edition (self-hosted)
-- **IaC:** Azure CLI, Helm
+- **IaC:** Azure CLI, gcloud CLI, Helm
 - **DNS:** Cloudflare (API-managed)
-- **CLI Tools:** kubectl, helm, az, tsh, tctl
+- **CLI Tools:** kubectl, helm, az, gcloud, tsh, tctl
 
 **Project Management:**
 - **Issue Tracking:** Linear (Team Tacocat)
@@ -45,7 +45,7 @@ Internet
 Azure Load Balancer (Teleport)
     │
     ▼
-AKS Cluster (portainer-rg)
+AKS Cluster (portainer-rg, eastus)
     │
     ├── teleport-cluster namespace
     │       │
@@ -61,10 +61,20 @@ AKS Cluster (portainer-rg)
     │       ▼
     │   Portainer BE (ClusterIP, port 9443 HTTPS)
     │       │  (no public IP, accessed via Teleport)
+    │       │  Manages: AKS (local) + GKE (remote agent)
     │       ▼
     │   Persistent Volume (default StorageClass)
     │
     └── (future namespaces for learning path modules)
+
+GKE Cluster (dev-david-024680, us-central1-a)
+    │
+    ├── portainer namespace
+    │       └── Portainer Agent (LoadBalancer, port 9001)
+    │               (firewall: port 9001 restricted to AKS egress IP)
+    │
+    └── teleport-cluster namespace
+            └── Teleport Kube Agent (registered as "portainer-gke")
 ```
 
 ---
@@ -182,17 +192,21 @@ Add a summary comment to the PR:
 - Default StorageClass configured
 - Kubernetes metrics server installed
 
-### Helm Installation (Load Balancer)
+### Helm Installation (ClusterIP via Teleport)
 ```bash
 helm repo add portainer https://portainer.github.io/k8s/
 helm repo update
 
-helm upgrade --install --create-namespace -n portainer portainer portainer/portainer \
-    --set service.type=LoadBalancer \
+helm upgrade --install --create-namespace --wait -n portainer portainer portainer/portainer \
+    --set service.type=ClusterIP \
     --set tls.force=true \
     --set enterpriseEdition.enabled=true \
-    --set image.tag=lts
+    --set image.tag=lts \
+    --set trusted_origins.enabled=true \
+    --set trusted_origins.domains="portainer.teleport.davidshaevel.com"
 ```
+
+> **Known Issue:** The Portainer Helm chart wraps `--trusted-origins` values in escaped double quotes, causing CSRF validation to fail. The `scripts/portainer/aks-install.sh` script patches the deployment args after install as a workaround.
 
 ### Access
 - **Via Teleport:** `https://teleport.davidshaevel.com` (Portainer app in sidebar)
@@ -208,8 +222,12 @@ az account set --subscription "DavidShaevel.com Subscription Two"
 az group list --output table
 
 # AKS
-az aks get-credentials --resource-group portainer-rg --name <cluster-name>
+az aks get-credentials --resource-group portainer-rg --name portainer-aks
 az aks list --resource-group portainer-rg --output table
+
+# GKE
+gcloud container clusters get-credentials portainer-gke --zone us-central1-a --project <project-id>
+gcloud container clusters list --project <project-id>
 
 # Kubernetes
 kubectl get nodes
@@ -277,9 +295,10 @@ source .envrc
 | Variable | Used By | Purpose |
 |----------|---------|---------|
 | `AZURE_SUBSCRIPTION` | `scripts/config.sh` | Azure subscription name or ID for all `az` commands |
-| `CLOUDFLARE_API_TOKEN` | `scripts/teleport-dns.sh` | Cloudflare API token with DNS edit permissions |
-| `CLOUDFLARE_ZONE_ID` | `scripts/teleport-dns.sh` | Cloudflare zone ID for davidshaevel.com |
-| `TELEPORT_ACME_EMAIL` | `scripts/teleport-install.sh` | Email for Let's Encrypt ACME certificate notifications |
+| `GCP_PROJECT` | `scripts/config.sh` | GCP project ID for GKE cluster |
+| `CLOUDFLARE_API_TOKEN` | `scripts/teleport/dns.sh` | Cloudflare API token with DNS edit permissions |
+| `CLOUDFLARE_ZONE_ID` | `scripts/teleport/dns.sh` | Cloudflare zone ID for davidshaevel.com |
+| `TELEPORT_ACME_EMAIL` | `scripts/teleport/install.sh` | Email for Let's Encrypt ACME certificate notifications |
 
 Scripts will error with a clear message if a required env var is missing.
 
@@ -311,7 +330,12 @@ davidshaevel-portainer/
 │   ├── .envrc                         # Environment variables (gitignored)
 │   ├── .envrc.example                 # Template for .envrc (committed)
 │   ├── .gitignore                     # Git ignore patterns
-│   ├── scripts/                       # Reusable az/kubectl/helm scripts
+│   ├── scripts/                       # Reusable az/kubectl/helm/gcloud scripts
+│   │   ├── config.sh                  # Shared configuration (sourced by all scripts)
+│   │   ├── aks/                       # AKS cluster lifecycle
+│   │   ├── gke/                       # GKE cluster lifecycle + firewall
+│   │   ├── portainer/                 # Portainer server + agent install/uninstall
+│   │   └── teleport/                  # Teleport server + agent install/uninstall
 │   └── docs/                          # Documentation
 │       ├── agendas/                   # Work session agendas
 │       └── plans/                     # Design documents and plans
@@ -372,7 +396,9 @@ cp <worktree-name>/CLAUDE.local.md main/CLAUDE.local.md
 
 - **Learning Path:** [Build Your First Kubernetes Developer Platform](https://rawkode.academy/learning-paths/build-your-first-kubernetes-developer-platform)
 - **Portainer BE Install Docs:** [Kubernetes Baremetal](https://docs.portainer.io/start/install/server/kubernetes/baremetal)
+- **Portainer Agent Install:** [Add Kubernetes via Agent](https://docs.portainer.io/admin/environments/add/kubernetes/agent)
 - **Azure AKS Docs:** [Azure Kubernetes Service](https://learn.microsoft.com/en-us/azure/aks/)
+- **Google GKE Docs:** [Google Kubernetes Engine](https://cloud.google.com/kubernetes-engine/docs)
 - **Teleport Helm Deploy:** [Deploy on Kubernetes](https://goteleport.com/docs/deploy-a-cluster/helm-deployments/kubernetes-cluster/)
 - **Teleport App Access:** [Application Access](https://goteleport.com/docs/application-access/)
 - **Teleport K8s Access:** [Kubernetes Access](https://goteleport.com/docs/kubernetes-access/)

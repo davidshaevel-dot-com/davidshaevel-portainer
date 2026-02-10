@@ -2,7 +2,7 @@
 # Install Teleport Community Edition via Helm.
 # Reference: https://goteleport.com/docs/deploy-a-cluster/helm-deployments/kubernetes-cluster/
 
-source "$(dirname "$0")/config.sh"
+source "$(dirname "$0")/../config.sh"
 setup_logging "teleport-install"
 
 TELEPORT_DOMAIN="teleport.davidshaevel.com"
@@ -48,7 +48,7 @@ if kubectl wait -n "${TELEPORT_NAMESPACE}" --for=jsonpath='{.status.loadBalancer
     echo "Teleport LoadBalancer IP: ${EXTERNAL_IP}"
     echo ""
     echo "Next steps:"
-    echo "  1. Run ./scripts/teleport-dns.sh to create DNS record"
+    echo "  1. Run ./scripts/teleport/dns.sh to create DNS record"
     echo "  2. Wait for TLS certificate (may take a few minutes)"
     echo "  3. Access https://${TELEPORT_DOMAIN}"
 else

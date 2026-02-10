@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # Show Teleport deployment status and access URL.
 
-source "$(dirname "$0")/config.sh"
+source "$(dirname "$0")/../config.sh"
 setup_logging "teleport-status"
 
 TELEPORT_NAMESPACE="teleport-cluster"
 
 if ! helm status teleport-cluster -n "${TELEPORT_NAMESPACE}" >/dev/null 2>&1; then
     echo "Teleport Helm release 'teleport-cluster' not found in namespace '${TELEPORT_NAMESPACE}'."
-    echo "Run ./scripts/teleport-install.sh to install it."
+    echo "Run ./scripts/teleport/install.sh to install it."
     exit 1
 fi
 
