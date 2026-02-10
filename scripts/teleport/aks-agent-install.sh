@@ -49,6 +49,14 @@ helm upgrade portainer portainer/portainer \
     --set service.type=ClusterIP \
     --wait
 
+# Grant admin user Kubernetes access via Teleport roles.
+# system:masters = full cluster-admin on AKS
+# cluster-admin = GKE-compatible admin group (GKE blocks system:masters impersonation)
+echo ""
+echo "Granting admin user Kubernetes group access..."
+kubectl exec -n "${TELEPORT_NAMESPACE}" deployment/teleport-cluster-auth -- \
+    tctl users update admin --set-kubernetes-groups=system:masters,cluster-admin
+
 echo ""
 echo "=== Verification ==="
 echo ""
