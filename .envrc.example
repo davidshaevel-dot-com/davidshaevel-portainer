@@ -18,3 +18,6 @@ export CLOUDFLARE_ZONE_ID="Your Cloudflare Zone ID"
 
 # Email address for Let's Encrypt ACME certificate notifications (Teleport TLS).
 export TELEPORT_ACME_EMAIL="your-email@example.com"
+
+# GCP project ID for GKE cluster.
+export GCP_PROJECT="your-gcp-project-id"

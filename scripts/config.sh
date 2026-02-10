@@ -1,15 +1,26 @@
 #!/usr/bin/env bash
-# Shared configuration for all AKS scripts.
-# Source this file from other scripts: source "$(dirname "$0")/config.sh"
+# Shared configuration for all scripts.
+# Source this file from subdirectory scripts: source "$(dirname "$0")/../config.sh"
 
 set -euo pipefail
 
+# --- Azure / AKS ---
 RESOURCE_GROUP="portainer-rg"
-CLUSTER_NAME="portainer-aks"
-LOCATION="eastus"
-NODE_COUNT=1
-NODE_VM_SIZE="Standard_B2s"
+AKS_CLUSTER_NAME="portainer-aks"
+AKS_LOCATION="eastus"
+AKS_NODE_COUNT=1
+AKS_NODE_VM_SIZE="Standard_B2s"
 SUBSCRIPTION="${AZURE_SUBSCRIPTION:?Set AZURE_SUBSCRIPTION in .envrc or environment}"
+
+# --- GCP / GKE ---
+GCP_PROJECT="${GCP_PROJECT:?Set GCP_PROJECT in .envrc or environment}"
+GKE_CLUSTER_NAME="portainer-gke"
+GKE_ZONE="us-central1-a"
+GKE_MACHINE_TYPE="e2-medium"
+GKE_NODE_COUNT=1
+
+# --- Portainer Agent ---
+PORTAINER_AGENT_MANIFEST="https://downloads.portainer.io/ee2-21/portainer-agent-k8s-lb.yaml"
 
 # Log directory for tailing script output from a separate terminal.
 LOG_DIR="/tmp/${USER}-portainer"

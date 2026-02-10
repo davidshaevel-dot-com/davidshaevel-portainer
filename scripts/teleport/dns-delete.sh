@@ -5,7 +5,7 @@
 #   *.teleport.davidshaevel.com (app subdomains)
 # Requires: CLOUDFLARE_API_TOKEN and CLOUDFLARE_ZONE_ID in .envrc
 
-source "$(dirname "$0")/config.sh"
+source "$(dirname "$0")/../config.sh"
 setup_logging "teleport-dns-delete"
 
 DOMAIN="teleport.davidshaevel.com"

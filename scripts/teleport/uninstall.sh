@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Uninstall Teleport and clean up resources.
 
-source "$(dirname "$0")/config.sh"
+source "$(dirname "$0")/../config.sh"
 setup_logging "teleport-uninstall"
 
 TELEPORT_NAMESPACE="teleport-cluster"
@@ -31,4 +31,4 @@ echo ""
 echo "Teleport uninstalled."
 echo ""
 echo "Remember to delete the DNS record:"
-echo "  ./scripts/teleport-dns-delete.sh"
+echo "  ./scripts/teleport/dns-delete.sh"

@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Show Portainer deployment status and access URL.
 
-source "$(dirname "$0")/config.sh"
+source "$(dirname "$0")/../config.sh"
 setup_logging "portainer-status"
 
 if ! helm status portainer -n portainer >/dev/null 2>&1; then
     echo "Portainer Helm release 'portainer' not found in namespace 'portainer'."
-    echo "Run ./scripts/portainer-install.sh to install it."
+    echo "Run ./scripts/portainer/aks-install.sh to install it."
     exit 1
 fi
 

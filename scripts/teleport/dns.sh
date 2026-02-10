@@ -6,7 +6,7 @@
 # Requires: CLOUDFLARE_API_TOKEN and CLOUDFLARE_ZONE_ID in .envrc
 # Reference: https://developers.cloudflare.com/api/resources/dns/subresources/records/
 
-source "$(dirname "$0")/config.sh"
+source "$(dirname "$0")/../config.sh"
 setup_logging "teleport-dns"
 
 DOMAIN="teleport.davidshaevel.com"

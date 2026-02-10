@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Uninstall Portainer and clean up resources.
 
-source "$(dirname "$0")/config.sh"
+source "$(dirname "$0")/../config.sh"
 setup_logging "portainer-uninstall"
 
 echo "WARNING: This will uninstall Portainer from the cluster."
