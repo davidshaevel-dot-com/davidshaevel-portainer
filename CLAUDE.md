@@ -248,7 +248,13 @@ tsh kube login portainer-aks      # Switch kubectl to AKS via Teleport
 tsh kube login portainer-gke      # Switch kubectl to GKE via Teleport
 tsh logout                        # Log out (re-login to refresh roles)
 
-# Teleport admin (via auth pod) - no tsh required
+# Direct kubectl context switching (bypasses Teleport)
+# Use direct contexts for admin tasks like tctl via kubectl exec on the auth pod.
+kubectl config current-context                        # Check active context
+kubectl config use-context portainer-aks              # Switch to AKS directly
+kubectl config use-context gke_dev-david-024680_us-central1-a_portainer-gke  # Switch to GKE directly
+
+# Teleport admin (via auth pod) - requires direct AKS context, not Teleport
 kubectl exec -n teleport-cluster deployment/teleport-cluster-auth -- tctl status
 kubectl exec -n teleport-cluster deployment/teleport-cluster-auth -- tctl users ls
 kubectl exec -n teleport-cluster deployment/teleport-cluster-auth -- tctl apps ls
