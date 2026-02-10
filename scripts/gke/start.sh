@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Orchestrated rebuild of the GKE environment.
 # This script grows incrementally through the week:
-#   v1 (Day 1): cluster + Portainer agent + firewall + Teleport agent
+#   v1 (Day 1): cluster + Portainer agent + Teleport agent
 #   v2 (Day 2): + app deployment + Cloudflare DNS
 #   v3 (Day 3): + Prometheus/Grafana stack
 
@@ -16,19 +16,15 @@ echo "=========================================="
 echo ""
 
 # Step 1: Create cluster.
-echo "--- Step 1/4: Create GKE cluster ---"
+echo "--- Step 1/3: Create GKE cluster ---"
 "${SCRIPT_DIR}/create.sh"
 
 echo ""
-echo "--- Step 2/4: Configure firewall ---"
-"${SCRIPT_DIR}/firewall.sh"
-
-echo ""
-echo "--- Step 3/4: Install Portainer Agent ---"
+echo "--- Step 2/3: Install Portainer Agent ---"
 "${SCRIPT_DIR}/../portainer/gke-agent-install.sh"
 
 echo ""
-echo "--- Step 4/4: Install Teleport Agent ---"
+echo "--- Step 3/3: Install Teleport Agent ---"
 "${SCRIPT_DIR}/../teleport/gke-agent-install.sh"
 
 echo ""

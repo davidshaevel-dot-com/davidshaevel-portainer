@@ -33,13 +33,13 @@ GKE Cluster (us-central1-a)
     |
     +-- portainer namespace
     |       +-- Portainer Agent (LoadBalancer, port 9001)
-    |               (GCP firewall: port 9001 restricted to AKS egress IP)
+    |               (loadBalancerSourceRanges: AKS egress IP only)
     |
     +-- teleport-cluster namespace
             +-- Teleport Kube Agent (kubectl access via Teleport)
 ```
 
-All traffic flows through Teleport. Portainer has no public endpoint. The GKE Portainer Agent is protected by a GCP firewall rule scoped to the AKS cluster's egress IP.
+All traffic flows through Teleport. Portainer has no public endpoint. The GKE Portainer Agent LoadBalancer is restricted to the AKS cluster's egress IP via `loadBalancerSourceRanges`.
 
 ## Tech Stack
 
@@ -118,7 +118,6 @@ All traffic flows through Teleport. Portainer has no public endpoint. The GKE Po
 
    ```bash
    ./scripts/gke/create.sh
-   ./scripts/gke/firewall.sh
    ./scripts/portainer/gke-agent-install.sh
    ./scripts/teleport/gke-agent-install.sh
    ```
@@ -146,11 +145,10 @@ All scripts source `scripts/config.sh` for shared configuration and log output t
 |--------|-------------|
 | `gke/create.sh` | Create the GKE cluster (enables API if needed) |
 | `gke/delete.sh` | Delete the GKE cluster |
-| `gke/start.sh` | Orchestrated rebuild (create + firewall + agents) |
+| `gke/start.sh` | Orchestrated rebuild (create + agents) |
 | `gke/stop.sh` | Delete the GKE cluster (GKE has no stop/start) |
 | `gke/status.sh` | Show cluster status |
 | `gke/credentials.sh` | Fetch kubeconfig credentials |
-| `gke/firewall.sh` | Create/update GCP firewall (port 9001 to AKS egress IP) |
 
 ### Portainer (`scripts/portainer/`)
 

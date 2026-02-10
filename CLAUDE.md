@@ -71,7 +71,7 @@ GKE Cluster (dev-david-024680, us-central1-a)
     │
     ├── portainer namespace
     │       └── Portainer Agent (LoadBalancer, port 9001)
-    │               (firewall: port 9001 restricted to AKS egress IP)
+    │               (loadBalancerSourceRanges: AKS egress IP only)
     │
     └── teleport-cluster namespace
             └── Teleport Kube Agent (registered as "portainer-gke")
@@ -346,7 +346,7 @@ davidshaevel-portainer/
 │   ├── scripts/                       # Reusable az/kubectl/helm/gcloud scripts
 │   │   ├── config.sh                  # Shared configuration (sourced by all scripts)
 │   │   ├── aks/                       # AKS cluster lifecycle
-│   │   ├── gke/                       # GKE cluster lifecycle + firewall
+│   │   ├── gke/                       # GKE cluster lifecycle
 │   │   ├── portainer/                 # Portainer server + agent install/uninstall
 │   │   └── teleport/                  # Teleport server + agent install/uninstall
 │   └── docs/                          # Documentation
