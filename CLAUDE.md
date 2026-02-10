@@ -241,7 +241,14 @@ helm status portainer -n portainer
 helm status teleport-cluster -n teleport-cluster
 helm status teleport-agent -n teleport-cluster
 
-# Teleport (via auth pod)
+# Teleport client (tsh) - requires tsh installed locally
+tsh login --proxy=teleport.davidshaevel.com --user=admin
+tsh kube ls                       # List available kube clusters
+tsh kube login portainer-aks      # Switch kubectl to AKS via Teleport
+tsh kube login portainer-gke      # Switch kubectl to GKE via Teleport
+tsh logout                        # Log out (re-login to refresh roles)
+
+# Teleport admin (via auth pod) - no tsh required
 kubectl exec -n teleport-cluster deployment/teleport-cluster-auth -- tctl status
 kubectl exec -n teleport-cluster deployment/teleport-cluster-auth -- tctl users ls
 kubectl exec -n teleport-cluster deployment/teleport-cluster-auth -- tctl apps ls
