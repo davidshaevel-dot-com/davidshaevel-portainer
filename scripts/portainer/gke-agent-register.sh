@@ -112,6 +112,13 @@ if [ -n "${EXISTING_ID}" ]; then
         -H "Authorization: Bearer ${JWT}" \
         -H "Content-Type: application/json" \
         -d "{\"Name\":\"${ENDPOINT_NAME}\",\"URL\":\"tcp://${AGENT_IP}:9001\",\"TLS\":true,\"TLSSkipVerify\":true,\"GroupID\":${PORTAINER_GROUP_ID}}")
+
+    UPDATED_ID=$(echo "${UPDATE_RESPONSE}" | jq -r '.Id // empty')
+    if [ -z "${UPDATED_ID}" ]; then
+        echo "Error: Failed to update endpoint."
+        echo "Response: ${UPDATE_RESPONSE}"
+        exit 1
+    fi
     echo "Endpoint updated."
 else
     echo "Creating endpoint '${ENDPOINT_NAME}'..."

@@ -84,7 +84,12 @@ if [ -z "${ENDPOINT_ID}" ]; then
 fi
 
 echo "Deleting endpoint '${ENDPOINT_NAME}' (ID: ${ENDPOINT_ID})..."
-curl -sk -X DELETE "${PORTAINER_BASE_URL}/api/endpoints/${ENDPOINT_ID}" \
-    -H "Authorization: Bearer ${JWT}"
+RESPONSE_CODE=$(curl -sk -w "%{http_code}" -o /dev/null -X DELETE "${PORTAINER_BASE_URL}/api/endpoints/${ENDPOINT_ID}" \
+    -H "Authorization: Bearer ${JWT}")
 
-echo "Endpoint '${ENDPOINT_NAME}' removed from Portainer."
+if [[ "${RESPONSE_CODE}" -eq 204 ]]; then
+    echo "Endpoint '${ENDPOINT_NAME}' removed from Portainer."
+else
+    echo "Error: Failed to delete endpoint. Received status code ${RESPONSE_CODE}."
+    exit 1
+fi
