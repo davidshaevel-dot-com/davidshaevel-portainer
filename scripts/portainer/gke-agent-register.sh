@@ -19,6 +19,7 @@ PORTAINER_ADMIN_PASSWORD="${PORTAINER_ADMIN_PASSWORD:?Set PORTAINER_ADMIN_PASSWO
 PORTAINER_LOCAL_PORT=9444
 PORTAINER_BASE_URL="https://localhost:${PORTAINER_LOCAL_PORT}"
 ENDPOINT_NAME="GKE"
+PORTAINER_GROUP_ID=1
 
 # --- Step 1: Get GKE Agent LoadBalancer IP ---
 echo "Getting GKE Portainer Agent LoadBalancer IP..."
@@ -110,14 +111,14 @@ if [ -n "${EXISTING_ID}" ]; then
     UPDATE_RESPONSE=$(curl -sk -X PUT "${PORTAINER_BASE_URL}/api/endpoints/${EXISTING_ID}" \
         -H "Authorization: Bearer ${JWT}" \
         -H "Content-Type: application/json" \
-        -d "{\"Name\":\"${ENDPOINT_NAME}\",\"URL\":\"tcp://${AGENT_IP}:9001\",\"TLS\":true,\"TLSSkipVerify\":true,\"GroupID\":1}")
+        -d "{\"Name\":\"${ENDPOINT_NAME}\",\"URL\":\"tcp://${AGENT_IP}:9001\",\"TLS\":true,\"TLSSkipVerify\":true,\"GroupID\":${PORTAINER_GROUP_ID}}")
     echo "Endpoint updated."
 else
     echo "Creating endpoint '${ENDPOINT_NAME}'..."
     CREATE_RESPONSE=$(curl -sk -X POST "${PORTAINER_BASE_URL}/api/endpoints" \
         -H "Authorization: Bearer ${JWT}" \
         -H "Content-Type: application/json" \
-        -d "{\"Name\":\"${ENDPOINT_NAME}\",\"EndpointCreationType\":2,\"URL\":\"tcp://${AGENT_IP}:9001\",\"TLS\":true,\"TLSSkipVerify\":true,\"GroupID\":1}")
+        -d "{\"Name\":\"${ENDPOINT_NAME}\",\"EndpointCreationType\":2,\"URL\":\"tcp://${AGENT_IP}:9001\",\"TLS\":true,\"TLSSkipVerify\":true,\"GroupID\":${PORTAINER_GROUP_ID}}")
 
     NEW_ID=$(echo "${CREATE_RESPONSE}" | jq -r '.Id // empty')
     if [ -z "${NEW_ID}" ]; then
@@ -131,11 +132,22 @@ fi
 # --- Step 5: Verify connection ---
 echo ""
 echo "Verifying endpoint connection..."
-sleep 3
-ENDPOINTS=$(curl -sk -X GET "${PORTAINER_BASE_URL}/api/endpoints" \
-    -H "Authorization: Bearer ${JWT}")
-ENDPOINT_STATUS=$(echo "${ENDPOINTS}" | jq -r ".[] | select(.Name == \"${ENDPOINT_NAME}\") | .Status")
-echo "Endpoint '${ENDPOINT_NAME}' status: ${ENDPOINT_STATUS} (1=connected, 2=disconnected)"
+for i in {1..15}; do
+    ENDPOINTS=$(curl -sk -X GET "${PORTAINER_BASE_URL}/api/endpoints" \
+        -H "Authorization: Bearer ${JWT}")
+    ENDPOINT_STATUS=$(echo "${ENDPOINTS}" | jq -r ".[] | select(.Name == \"${ENDPOINT_NAME}\") | .Status")
+
+    if [[ "${ENDPOINT_STATUS}" == "1" ]]; then
+        echo "Endpoint '${ENDPOINT_NAME}' status: connected"
+        break
+    fi
+
+    if [[ "$i" -eq 15 ]]; then
+        echo "Warning: Endpoint '${ENDPOINT_NAME}' not yet connected after 15 seconds (status: ${ENDPOINT_STATUS}). Registration succeeded — connection may still be initializing."
+        break
+    fi
+    sleep 1
+done
 
 echo ""
 echo "Portainer agent registration complete."
