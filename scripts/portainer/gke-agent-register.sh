@@ -54,8 +54,6 @@ echo "Starting port-forward to Portainer (localhost:${PORTAINER_LOCAL_PORT} -> p
 kubectl port-forward svc/portainer -n portainer "${PORTAINER_LOCAL_PORT}:9443" &
 PF_PID=$!
 
-sleep 5
-
 # Ensure port-forward is cleaned up on exit.
 cleanup() {
     if kill -0 "${PF_PID}" 2>/dev/null; then
@@ -66,10 +64,23 @@ cleanup() {
 }
 trap cleanup EXIT
 
-if ! kill -0 "${PF_PID}" 2>/dev/null; then
-    echo "Error: port-forward failed to start."
-    exit 1
-fi
+# Wait up to 15 seconds for port-forward to be ready
+echo "Waiting for port-forward to be ready..."
+for i in {1..15}; do
+    if curl -sk "${PORTAINER_BASE_URL}" >/dev/null; then
+        echo "Port-forward is ready."
+        break
+    fi
+    if ! kill -0 "${PF_PID}"; then
+        echo "Error: port-forward process died unexpectedly."
+        exit 1
+    fi
+    if [[ "$i" -eq 15 ]]; then
+        echo "Error: port-forward timed out."
+        exit 1
+    fi
+    sleep 1
+done
 
 # --- Step 3: Authenticate to Portainer API ---
 echo ""
