@@ -21,3 +21,6 @@ export TELEPORT_ACME_EMAIL="your-email@example.com"
 
 # GCP project ID for GKE cluster.
 export GCP_PROJECT="your-gcp-project-id"
+
+# Portainer admin password for REST API automation (gke-agent-register/deregister).
+export PORTAINER_ADMIN_PASSWORD="your-portainer-admin-password"

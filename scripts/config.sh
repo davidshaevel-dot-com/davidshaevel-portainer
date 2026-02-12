@@ -23,8 +23,11 @@ GKE_NODE_COUNT=1
 PORTAINER_AGENT_MANIFEST="https://downloads.portainer.io/ee2-21/portainer-agent-k8s-lb.yaml"
 
 # Log directory for tailing script output from a separate terminal.
-LOG_DIR="/tmp/${USER}-portainer"
-mkdir -p "${LOG_DIR}"
+# In CI (GitHub Actions sets CI=true), skip file logging — the runner captures output natively.
+if [[ "${CI:-}" != "true" ]]; then
+    LOG_DIR="/tmp/${USER}-portainer"
+    mkdir -p "${LOG_DIR}"
+fi
 
 # Call this at the top of each script after sourcing config.sh:
 #   setup_logging "script-name"
@@ -35,6 +38,9 @@ setup_logging() {
         echo "Error: setup_logging requires a script name." >&2
         echo "Usage: setup_logging <script-name>" >&2
         exit 1
+    fi
+    if [[ "${CI:-}" == "true" ]]; then
+        return
     fi
     local script_name="${1}"
     local log_file="${LOG_DIR}/${script_name}.log"
