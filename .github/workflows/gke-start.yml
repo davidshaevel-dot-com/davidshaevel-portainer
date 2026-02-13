@@ -57,6 +57,9 @@ jobs:
       - name: Register GKE in Portainer
         run: ./scripts/portainer/gke-agent-register.sh
 
+      - name: Restrict Agent LoadBalancer
+        run: ./scripts/portainer/gke-agent-restrict-lb.sh
+
       - name: Install Teleport Agent
         run: ./scripts/teleport/gke-agent-install.sh
 
