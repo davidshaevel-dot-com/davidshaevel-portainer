@@ -67,7 +67,19 @@ All workflows are triggered manually via `workflow_dispatch` from the GitHub Act
 
 ### Setup
 
-The workflows require an Azure service principal, a GCP service account, and 8 GitHub repository secrets. Helper scripts automate the entire setup:
+The workflows require an Azure service principal, a GCP service account, and 8 GitHub repository secrets. Helper scripts automate the entire setup.
+
+First, ensure `.envrc` is configured with all 6 variables (see [.envrc.example](.envrc.example)):
+
+```bash
+cp .envrc.example .envrc
+# Edit .envrc with your values:
+#   AZURE_SUBSCRIPTION, GCP_PROJECT, CLOUDFLARE_API_TOKEN,
+#   CLOUDFLARE_ZONE_ID, TELEPORT_ACME_EMAIL, PORTAINER_ADMIN_PASSWORD
+source .envrc
+```
+
+Then run the setup scripts:
 
 1. **Create the Azure service principal** (requires `az` CLI, logged in):
 
