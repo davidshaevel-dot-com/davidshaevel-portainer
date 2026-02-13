@@ -5,8 +5,10 @@
 source "$(dirname "$0")/../config.sh"
 setup_logging "gke-create"
 
-echo "Enabling GKE API on project '${GCP_PROJECT}'..."
-gcloud services enable container.googleapis.com --project="${GCP_PROJECT}" --quiet
+if [[ "${CI:-}" != "true" ]]; then
+    echo "Enabling GKE API on project '${GCP_PROJECT}'..."
+    gcloud services enable container.googleapis.com --project="${GCP_PROJECT}" --quiet
+fi
 
 echo ""
 echo "Creating GKE cluster '${GKE_CLUSTER_NAME}' in project '${GCP_PROJECT}'..."
