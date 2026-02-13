@@ -123,8 +123,12 @@ fi
 echo "Creating endpoint '${ENDPOINT_NAME}'..."
 CREATE_RESPONSE=$(curl -sk -X POST "${PORTAINER_BASE_URL}/api/endpoints" \
     -H "Authorization: Bearer ${JWT}" \
-    -H "Content-Type: application/json" \
-    -d "{\"Name\":\"${ENDPOINT_NAME}\",\"EndpointCreationType\":2,\"URL\":\"tcp://${AGENT_IP}:9001\",\"TLS\":true,\"TLSSkipVerify\":true,\"GroupID\":${PORTAINER_GROUP_ID}}")
+    -F "Name=${ENDPOINT_NAME}" \
+    -F "EndpointCreationType=2" \
+    -F "URL=tcp://${AGENT_IP}:9001" \
+    -F "TLS=true" \
+    -F "TLSSkipVerify=true" \
+    -F "GroupID=${PORTAINER_GROUP_ID}")
 
 NEW_ID=$(echo "${CREATE_RESPONSE}" | jq -r '.Id // empty')
 if [ -z "${NEW_ID}" ]; then
