@@ -36,11 +36,19 @@ gcloud iam service-accounts create "${SA_NAME}" \
     --project="${GCP_PROJECT}" \
     --display-name="GitHub Actions - Portainer" 2>/dev/null || echo "Service account already exists."
 
-# Grant container.admin role
+# Grant container.admin role (GKE cluster CRUD)
 echo "Granting roles/container.admin..."
 gcloud projects add-iam-policy-binding "${GCP_PROJECT}" \
     --member="serviceAccount:${SA_EMAIL}" \
     --role="roles/container.admin" \
+    --condition=None \
+    --quiet
+
+# Grant iam.serviceAccountUser role (required to use default compute SA when creating GKE clusters)
+echo "Granting roles/iam.serviceAccountUser..."
+gcloud projects add-iam-policy-binding "${GCP_PROJECT}" \
+    --member="serviceAccount:${SA_EMAIL}" \
+    --role="roles/iam.serviceAccountUser" \
     --condition=None \
     --quiet
 
