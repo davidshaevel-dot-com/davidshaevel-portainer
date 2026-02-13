@@ -61,9 +61,16 @@ All workflows are triggered manually via `workflow_dispatch` from the GitHub Act
 | Workflow | Description |
 |----------|-------------|
 | **AKS Start** | Start the AKS cluster, wait for pods, update Cloudflare DNS, verify Teleport accessibility |
-| **AKS Stop** | Optionally delete DNS records, stop the AKS cluster to save costs |
+| **AKS Stop** | Delete Cloudflare DNS records, stop the AKS cluster to save costs |
 | **GKE Start** | Create GKE cluster, install Portainer Agent, register in Portainer via API, install Teleport Agent. Auto-deletes cluster on failure to prevent costs |
-| **GKE Stop** | Optionally deregister from Portainer via API, delete the GKE cluster |
+| **GKE Stop** | Deregister from Portainer via API, delete the GKE cluster |
+
+**AKS Stop** and **GKE Stop** have workflow inputs shown in the "Run workflow" dialog:
+
+| Workflow | Input | Default | Description |
+|----------|-------|---------|-------------|
+| AKS Stop | `delete_dns` | `true` | Delete Cloudflare DNS records for Teleport |
+| GKE Stop | `deregister_portainer` | `true` | Remove GKE endpoint from Portainer |
 
 ### Setup
 
