@@ -107,36 +107,34 @@ EXISTING_ENDPOINTS=$(curl -sk -X GET "${PORTAINER_BASE_URL}/api/endpoints" \
 EXISTING_ID=$(echo "${EXISTING_ENDPOINTS}" | jq -r ".[] | select(.Name == \"${ENDPOINT_NAME}\") | .Id // empty")
 
 if [ -n "${EXISTING_ID}" ]; then
-    echo "Endpoint '${ENDPOINT_NAME}' already exists (ID: ${EXISTING_ID}). Updating URL..."
-    UPDATE_RESPONSE=$(curl -sk -X PUT "${PORTAINER_BASE_URL}/api/endpoints/${EXISTING_ID}" \
-        -H "Authorization: Bearer ${JWT}" \
-        -H "Content-Type: application/json" \
-        -d "{\"Name\":\"${ENDPOINT_NAME}\",\"URL\":\"tcp://${AGENT_IP}:9001\",\"TLS\":true,\"TLSSkipVerify\":true,\"GroupID\":${PORTAINER_GROUP_ID}}")
+    echo "Endpoint '${ENDPOINT_NAME}' already exists (ID: ${EXISTING_ID}). Deleting stale endpoint..."
+    RESPONSE_CODE=$(curl -sk -w "%{http_code}" -o /dev/null -X DELETE "${PORTAINER_BASE_URL}/api/endpoints/${EXISTING_ID}" \
+        -H "Authorization: Bearer ${JWT}")
 
-    UPDATED_ID=$(echo "${UPDATE_RESPONSE}" | jq -r '.Id // empty')
-    if [ -z "${UPDATED_ID}" ]; then
-        echo "Error: Failed to update endpoint."
-        echo "Response: ${UPDATE_RESPONSE}"
+    if [[ "${RESPONSE_CODE}" -eq 204 ]]; then
+        echo "Stale endpoint deleted."
+    else
+        echo "Error: Failed to delete stale endpoint. Received status code ${RESPONSE_CODE}."
         exit 1
     fi
-    echo "Endpoint updated."
-else
-    echo "Creating endpoint '${ENDPOINT_NAME}'..."
-    CREATE_RESPONSE=$(curl -sk -X POST "${PORTAINER_BASE_URL}/api/endpoints" \
-        -H "Authorization: Bearer ${JWT}" \
-        -H "Content-Type: application/json" \
-        -d "{\"Name\":\"${ENDPOINT_NAME}\",\"EndpointCreationType\":2,\"URL\":\"tcp://${AGENT_IP}:9001\",\"TLS\":true,\"TLSSkipVerify\":true,\"GroupID\":${PORTAINER_GROUP_ID}}")
-
-    NEW_ID=$(echo "${CREATE_RESPONSE}" | jq -r '.Id // empty')
-    if [ -z "${NEW_ID}" ]; then
-        echo "Error: Failed to create endpoint."
-        echo "Response: ${CREATE_RESPONSE}"
-        exit 1
-    fi
-    echo "Endpoint created (ID: ${NEW_ID})."
 fi
 
-# --- Step 5: Verify connection ---
+# --- Step 5: Create endpoint ---
+echo "Creating endpoint '${ENDPOINT_NAME}'..."
+CREATE_RESPONSE=$(curl -sk -X POST "${PORTAINER_BASE_URL}/api/endpoints" \
+    -H "Authorization: Bearer ${JWT}" \
+    -H "Content-Type: application/json" \
+    -d "{\"Name\":\"${ENDPOINT_NAME}\",\"EndpointCreationType\":2,\"URL\":\"tcp://${AGENT_IP}:9001\",\"TLS\":true,\"TLSSkipVerify\":true,\"GroupID\":${PORTAINER_GROUP_ID}}")
+
+NEW_ID=$(echo "${CREATE_RESPONSE}" | jq -r '.Id // empty')
+if [ -z "${NEW_ID}" ]; then
+    echo "Error: Failed to create endpoint."
+    echo "Response: ${CREATE_RESPONSE}"
+    exit 1
+fi
+echo "Endpoint created (ID: ${NEW_ID})."
+
+# --- Step 6: Verify connection ---
 echo ""
 echo "Verifying endpoint connection..."
 for i in {1..15}; do
