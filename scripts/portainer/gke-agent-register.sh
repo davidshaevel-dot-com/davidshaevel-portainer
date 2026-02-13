@@ -119,22 +119,31 @@ if [ -n "${EXISTING_ID}" ]; then
     fi
 fi
 
-# --- Step 5: Create endpoint ---
+# --- Step 5: Create endpoint (retry up to 90s for LB propagation) ---
 echo "Creating endpoint '${ENDPOINT_NAME}'..."
-CREATE_RESPONSE=$(curl -sk -X POST "${PORTAINER_BASE_URL}/api/endpoints" \
-    -H "Authorization: Bearer ${JWT}" \
-    -F "Name=${ENDPOINT_NAME}" \
-    -F "EndpointCreationType=2" \
-    -F "URL=tcp://${AGENT_IP}:9001" \
-    -F "GroupID=${PORTAINER_GROUP_ID}")
+for attempt in {1..6}; do
+    CREATE_RESPONSE=$(curl -sk -X POST "${PORTAINER_BASE_URL}/api/endpoints" \
+        -H "Authorization: Bearer ${JWT}" \
+        -F "Name=${ENDPOINT_NAME}" \
+        -F "EndpointCreationType=2" \
+        -F "URL=tcp://${AGENT_IP}:9001" \
+        -F "GroupID=${PORTAINER_GROUP_ID}")
 
-NEW_ID=$(echo "${CREATE_RESPONSE}" | jq -r '.Id // empty')
-if [ -z "${NEW_ID}" ]; then
-    echo "Error: Failed to create endpoint."
-    echo "Response: ${CREATE_RESPONSE}"
-    exit 1
-fi
-echo "Endpoint created (ID: ${NEW_ID})."
+    NEW_ID=$(echo "${CREATE_RESPONSE}" | jq -r '.Id // empty')
+    if [ -n "${NEW_ID}" ]; then
+        echo "Endpoint created (ID: ${NEW_ID})."
+        break
+    fi
+
+    if [[ "${attempt}" -eq 6 ]]; then
+        echo "Error: Failed to create endpoint after ${attempt} attempts."
+        echo "Response: ${CREATE_RESPONSE}"
+        exit 1
+    fi
+
+    echo "Attempt ${attempt}/6 failed (agent may not be routable yet). Retrying in 15s..."
+    sleep 15
+done
 
 # --- Step 6: Verify connection ---
 echo ""
