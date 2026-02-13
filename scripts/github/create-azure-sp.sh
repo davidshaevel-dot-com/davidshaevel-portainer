@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Create an Azure service principal for GitHub Actions.
-# The SP gets Contributor role scoped to the portainer-rg resource group.
+# The SP gets Contributor role scoped to:
+#   - portainer-rg (AKS cluster, DNS zone)
+#   - MC_portainer-rg_portainer-aks_eastus (AKS-managed infra: public IPs, etc.)
 #
 # Output: Writes the SP credentials JSON to azure-sp.json (gitignored).
 # This file is used by configure-secrets.sh to set the AZURE_CREDENTIALS secret.
@@ -24,12 +26,13 @@ fi
 
 AZURE_SUBSCRIPTION="${AZURE_SUBSCRIPTION:?Set AZURE_SUBSCRIPTION in .envrc or environment}"
 RESOURCE_GROUP="portainer-rg"
+MC_RESOURCE_GROUP="MC_portainer-rg_portainer-aks_eastus"
 SP_NAME="github-portainer"
 OUTPUT_FILE="${SCRIPT_DIR}/azure-sp.json"
 
 echo "Creating Azure service principal '${SP_NAME}'..."
 echo "  Subscription: ${AZURE_SUBSCRIPTION}"
-echo "  Scope: /subscriptions/.../resourceGroups/${RESOURCE_GROUP}"
+echo "  Scope: ${RESOURCE_GROUP}, ${MC_RESOURCE_GROUP}"
 echo ""
 
 # Get subscription ID
@@ -39,6 +42,7 @@ az ad sp create-for-rbac \
     --name "${SP_NAME}" \
     --role contributor \
     --scopes "/subscriptions/${SUB_ID}/resourceGroups/${RESOURCE_GROUP}" \
+              "/subscriptions/${SUB_ID}/resourceGroups/${MC_RESOURCE_GROUP}" \
     --json-auth > "${OUTPUT_FILE}"
 
 echo ""
