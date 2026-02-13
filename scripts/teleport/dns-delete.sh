@@ -38,10 +38,14 @@ if [ ${#RECORD_IDS[@]} -eq 0 ]; then
 fi
 
 echo ""
-read -r -p "Type 'delete' to confirm deletion of ${#RECORD_IDS[@]} record(s): " confirm
-if [ "${confirm}" != "delete" ]; then
-    echo "Confirmation failed. Aborting."
-    exit 1
+if [[ "${CI:-}" == "true" ]]; then
+    echo "CI mode: skipping interactive confirmation."
+else
+    read -r -p "Type 'delete' to confirm deletion of ${#RECORD_IDS[@]} record(s): " confirm
+    if [ "${confirm}" != "delete" ]; then
+        echo "Confirmation failed. Aborting."
+        exit 1
+    fi
 fi
 
 # Delete records using stored IDs (no redundant lookups).

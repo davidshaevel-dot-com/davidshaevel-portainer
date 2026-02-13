@@ -1,6 +1,6 @@
-# Portainer on Multi-Cloud Kubernetes
+# Multi-Cloud Kubernetes Platform
 
-A hands-on learning project for getting practical experience with Kubernetes and Portainer, following the [Build Your First Kubernetes Developer Platform](https://rawkode.academy/learning-paths/build-your-first-kubernetes-developer-platform) learning path from Rawkode Academy.
+A multi-cloud Kubernetes management platform with zero-trust access, cost-optimized lifecycle automation, and programmatic environment registration. Manages AKS and GKE clusters through Portainer Business Edition with Teleport-secured access — no direct public endpoints exposed.
 
 ## Architecture
 
@@ -49,9 +49,34 @@ All traffic flows through Teleport. Portainer has no public endpoint. The GKE Po
 | Container Orchestration | Kubernetes (multi-cluster) |
 | Platform Management | Portainer Business Edition |
 | Secure Access | Teleport Community Edition (self-hosted) |
+| CI/CD | GitHub Actions (workflow_dispatch) |
 | DNS | Cloudflare (API-managed) |
 | TLS | Let's Encrypt (ACME via Teleport) |
 | IaC | Azure CLI, gcloud CLI, Helm |
+
+## GitHub Actions Workflows
+
+All workflows are triggered manually via `workflow_dispatch` from the GitHub Actions UI.
+
+| Workflow | Description |
+|----------|-------------|
+| **AKS Start** | Start the AKS cluster, wait for pods, update Cloudflare DNS, verify Teleport accessibility |
+| **AKS Stop** | Optionally delete DNS records, stop the AKS cluster to save costs |
+| **GKE Start** | Create GKE cluster, install Portainer Agent, register in Portainer via API, install Teleport Agent. Auto-deletes cluster on failure to prevent costs |
+| **GKE Stop** | Optionally deregister from Portainer via API, delete the GKE cluster |
+
+### Required GitHub Secrets
+
+| Secret | Description |
+|--------|-------------|
+| `AZURE_CREDENTIALS` | Azure service principal JSON (`az ad sp create-for-rbac --json-auth`) |
+| `AZURE_SUBSCRIPTION` | Azure subscription name or ID |
+| `GCP_CREDENTIALS_JSON` | GCP service account key JSON |
+| `GCP_PROJECT` | GCP project ID |
+| `CLOUDFLARE_API_TOKEN` | Cloudflare API token (Zone:DNS:Edit) |
+| `CLOUDFLARE_ZONE_ID` | Cloudflare zone ID |
+| `TELEPORT_ACME_EMAIL` | Email for Let's Encrypt certificates |
+| `PORTAINER_ADMIN_PASSWORD` | Portainer admin password for API automation |
 
 ## Prerequisites
 
@@ -117,16 +142,14 @@ All traffic flows through Teleport. Portainer has no public endpoint. The GKE Po
 7. **Add a GKE cluster** (optional, multi-cluster setup):
 
    ```bash
-   ./scripts/gke/create.sh
-   ./scripts/portainer/gke-agent-install.sh
-   ./scripts/teleport/gke-agent-install.sh
+   ./scripts/gke/start.sh
    ```
 
-   Then add the GKE environment in the Portainer UI using the agent's LoadBalancer IP.
+   This creates the cluster, installs and registers the Portainer Agent via API, and installs the Teleport kube agent.
 
 ## Scripts
 
-All scripts source `scripts/config.sh` for shared configuration and log output to `/tmp/$USER-portainer/`.
+All scripts source `scripts/config.sh` for shared configuration. When running locally, output is logged to `/tmp/$USER-portainer/`. In CI (GitHub Actions), file logging is skipped — the runner captures output natively.
 
 ### AKS Cluster (`scripts/aks/`)
 
@@ -145,7 +168,7 @@ All scripts source `scripts/config.sh` for shared configuration and log output t
 |--------|-------------|
 | `gke/create.sh` | Create the GKE cluster (enables API if needed) |
 | `gke/delete.sh` | Delete the GKE cluster (interactive, requires confirmation) |
-| `gke/start.sh` | Orchestrated rebuild (create + agents) |
+| `gke/start.sh` | Orchestrated rebuild (create + agents + registration) |
 | `gke/stop.sh` | Delete the GKE cluster (non-interactive, for scripted use) |
 | `gke/status.sh` | Show cluster status |
 | `gke/credentials.sh` | Fetch kubeconfig credentials |
@@ -159,6 +182,8 @@ All scripts source `scripts/config.sh` for shared configuration and log output t
 | `portainer/aks-status.sh` | Show Portainer deployment status |
 | `portainer/gke-agent-install.sh` | Install Portainer Agent on GKE via kubectl manifest |
 | `portainer/gke-agent-uninstall.sh` | Remove Portainer Agent from GKE |
+| `portainer/gke-agent-register.sh` | Register GKE endpoint in Portainer via REST API |
+| `portainer/gke-agent-deregister.sh` | Remove GKE endpoint from Portainer via REST API |
 
 ### Teleport (`scripts/teleport/`)
 
@@ -185,19 +210,7 @@ Defined in `.envrc` (gitignored). See [.envrc.example](.envrc.example) for the t
 | `CLOUDFLARE_API_TOKEN` | Cloudflare API token (Zone:DNS:Edit) |
 | `CLOUDFLARE_ZONE_ID` | Cloudflare zone ID for the domain |
 | `TELEPORT_ACME_EMAIL` | Email for Let's Encrypt certificate notifications |
-
-## Learning Path Progress
-
-Following the [Rawkode Academy learning path](https://rawkode.academy/learning-paths/build-your-first-kubernetes-developer-platform) (~4.5 hours total):
-
-| # | Module | Status |
-|---|--------|--------|
-| 1 | Hands-on Introduction to Portainer | Video watched |
-| 2 | Hands-on Introduction to DevStand | Not started |
-| 3 | Introduction to Crossplane | Not started |
-| 4 | Crossplane in Action | Not started |
-| 5 | Hands-on Introduction to Waypoint | Not started |
-| 6 | Monitoring with Prometheus & Robusta | Not started |
+| `PORTAINER_ADMIN_PASSWORD` | Portainer admin password for API automation |
 
 ## Project Management
 
@@ -215,7 +228,7 @@ Following the [Rawkode Academy learning path](https://rawkode.academy/learning-p
 | GKE Autopilot/Standard (e2-medium) | ~$25 |
 | **Total** | **~$75-80** |
 
-Stop AKS when not in use: `./scripts/aks/stop.sh`. Delete GKE when not in use: `./scripts/gke/stop.sh` (GKE has no stop/start — use `./scripts/gke/start.sh` to rebuild).
+Stop AKS when not in use: `./scripts/aks/stop.sh` or run the **AKS Stop** workflow. Delete GKE when not in use: `./scripts/gke/stop.sh` or run the **GKE Stop** workflow (GKE has no stop/start — use `./scripts/gke/start.sh` or the **GKE Start** workflow to rebuild).
 
 ## License
 

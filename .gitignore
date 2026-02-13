@@ -43,6 +43,8 @@ secrets/
 *.pem
 *.key
 *.crt
+scripts/github/azure-sp.json
+scripts/github/gcp-sa-key.json
 
 # Logs
 logs/
