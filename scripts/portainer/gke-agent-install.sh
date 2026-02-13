@@ -21,8 +21,8 @@ echo ""
 kubectl apply -f "${PORTAINER_AGENT_MANIFEST}"
 
 echo ""
-echo "Waiting for agent pod to be ready..."
-kubectl wait -n portainer --for=condition=ready pod -l app=portainer-agent --timeout=2m
+echo "Waiting for agent deployment to be ready..."
+kubectl rollout status deployment/portainer-agent -n portainer --timeout=2m
 
 echo ""
 echo "Waiting for LoadBalancer external IP..."
