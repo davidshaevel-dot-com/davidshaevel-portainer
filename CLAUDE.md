@@ -11,9 +11,10 @@ This is a hands-on learning project for getting practical experience with Kubern
 - **Container Orchestration:** Kubernetes (multi-cluster)
 - **Platform Management:** Portainer Business Edition (BE)
 - **Secure Access:** Teleport Community Edition (self-hosted)
+- **CI/CD:** GitHub Actions (workflow_dispatch)
 - **IaC:** Azure CLI, gcloud CLI, Helm
 - **DNS:** Cloudflare (API-managed)
-- **CLI Tools:** kubectl, helm, az, gcloud, tsh, tctl
+- **CLI Tools:** kubectl, helm, az, gcloud, gh, tsh, tctl
 
 **Project Management:**
 - **Issue Tracking:** Linear (Team Tacocat)
@@ -312,6 +313,7 @@ source .envrc
 | `CLOUDFLARE_API_TOKEN` | `scripts/teleport/dns.sh` | Cloudflare API token with DNS edit permissions |
 | `CLOUDFLARE_ZONE_ID` | `scripts/teleport/dns.sh` | Cloudflare zone ID for davidshaevel.com |
 | `TELEPORT_ACME_EMAIL` | `scripts/teleport/install.sh` | Email for Let's Encrypt ACME certificate notifications |
+| `PORTAINER_ADMIN_PASSWORD` | `scripts/portainer/gke-agent-register.sh` | Portainer admin password for REST API automation |
 
 Scripts will error with a clear message if a required env var is missing.
 
@@ -347,11 +349,13 @@ davidshaevel-portainer/
 │   │   ├── config.sh                  # Shared configuration (sourced by all scripts)
 │   │   ├── aks/                       # AKS cluster lifecycle
 │   │   ├── gke/                       # GKE cluster lifecycle
+│   │   ├── github/                    # GitHub Actions setup (SP, SA, secrets)
 │   │   ├── portainer/                 # Portainer server + agent install/uninstall
 │   │   └── teleport/                  # Teleport server + agent install/uninstall
 │   └── docs/                          # Documentation
 │       ├── agendas/                   # Work session agendas
-│       └── plans/                     # Design documents and plans
+│       ├── plans/                     # Design documents and plans
+│       └── postmortems/              # Incident postmortems
 │
 └── <feature-worktrees>/               # Feature branch worktrees (flat!)
 ```

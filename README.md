@@ -282,16 +282,16 @@ Defined in `.envrc` (gitignored). See [.envrc.example](.envrc.example) for the t
 
 ## Cost Estimate
 
-| Component | Monthly Cost |
-|-----------|-------------|
-| AKS control plane | Free |
-| AKS Standard_B2s node (1x) | ~$30 |
-| AKS Load Balancer (Teleport) | ~$18 |
-| AKS Managed Disks (PVs) | ~$1-5 |
-| GKE Autopilot/Standard (e2-medium) | ~$25 |
-| **Total** | **~$75-80** |
+| Component | Running | Stopped |
+|-----------|---------|---------|
+| AKS control plane | Free | Free |
+| AKS Standard_B2s node (1x) | ~$30 | $0 |
+| AKS Load Balancer (Teleport) | ~$18 | $0 |
+| AKS Managed Disks (PVs) | ~$1-5 | ~$1-5 |
+| GKE Standard (e2-medium, 1 node) | ~$25 | $0 (deleted) |
+| **Total** | **~$75-80** | **~$1-5** |
 
-Stop AKS when not in use: `./scripts/aks/stop.sh` or run the **AKS Stop** workflow. Delete GKE when not in use: `./scripts/gke/stop.sh` or run the **GKE Stop** workflow (GKE has no stop/start — use `./scripts/gke/start.sh` or the **GKE Start** workflow to rebuild).
+GKE has no stop/start — the **GKE Stop** workflow deletes the cluster entirely ($0), and **GKE Start** rebuilds it from scratch. AKS can be stopped and restarted without data loss (persistent volumes are retained). Managed disks are the only cost when both clusters are down.
 
 ## License
 
