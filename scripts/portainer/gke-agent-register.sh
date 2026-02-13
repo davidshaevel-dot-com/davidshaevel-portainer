@@ -127,6 +127,9 @@ for attempt in {1..6}; do
         -F "Name=${ENDPOINT_NAME}" \
         -F "EndpointCreationType=2" \
         -F "URL=tcp://${AGENT_IP}:9001" \
+        -F "TLS=true" \
+        -F "TLSSkipVerify=true" \
+        -F "TLSSkipClientVerify=true" \
         -F "GroupID=${PORTAINER_GROUP_ID}")
 
     NEW_ID=$(echo "${CREATE_RESPONSE}" | jq -r '.Id // empty')
