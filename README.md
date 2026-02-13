@@ -184,6 +184,7 @@ All scripts source `scripts/config.sh` for shared configuration. When running lo
 | `portainer/gke-agent-uninstall.sh` | Remove Portainer Agent from GKE |
 | `portainer/gke-agent-register.sh` | Register GKE endpoint in Portainer via REST API |
 | `portainer/gke-agent-deregister.sh` | Remove GKE endpoint from Portainer via REST API |
+| `portainer/gke-agent-restrict-lb.sh` | Restrict Agent LoadBalancer to AKS egress IP only |
 
 ### Teleport (`scripts/teleport/`)
 
@@ -198,6 +199,14 @@ All scripts source `scripts/config.sh` for shared configuration. When running lo
 | `teleport/aks-agent-uninstall.sh` | Remove Teleport agent from AKS |
 | `teleport/gke-agent-install.sh` | Deploy Teleport kube agent on GKE |
 | `teleport/gke-agent-uninstall.sh` | Remove Teleport agent from GKE |
+
+### GitHub Actions Setup (`scripts/github/`)
+
+| Script | Description |
+|--------|-------------|
+| `github/create-azure-sp.sh` | Create Azure service principal for GitHub Actions |
+| `github/create-gcp-sa.sh` | Create GCP service account for GitHub Actions |
+| `github/configure-secrets.sh` | Configure all required GitHub repository secrets |
 
 ## Environment Variables
 
