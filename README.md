@@ -72,7 +72,7 @@ All workflows are triggered manually via `workflow_dispatch` from the GitHub Act
 | AKS Stop | `delete_dns` | `true` | Delete Cloudflare DNS records for Teleport |
 | GKE Stop | `deregister_portainer` | `true` | Remove GKE endpoint from Portainer |
 
-### Setup
+### Setting Up GitHub Repository Secrets
 
 The workflows require an Azure service principal, a GCP service account, and 8 GitHub repository secrets. Helper scripts automate the entire setup.
 
@@ -144,7 +144,7 @@ Then run the setup scripts:
 - A Cloudflare-managed domain (for DNS)
 - A Portainer Business Edition license key
 
-## Setup
+## Local Setup
 
 1. **Clone the repository:**
 
