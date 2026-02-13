@@ -65,18 +65,52 @@ All workflows are triggered manually via `workflow_dispatch` from the GitHub Act
 | **GKE Start** | Create GKE cluster, install Portainer Agent, register in Portainer via API, install Teleport Agent. Auto-deletes cluster on failure to prevent costs |
 | **GKE Stop** | Optionally deregister from Portainer via API, delete the GKE cluster |
 
-### Required GitHub Secrets
+### Setup
 
-| Secret | Description |
-|--------|-------------|
-| `AZURE_CREDENTIALS` | Azure service principal JSON (`az ad sp create-for-rbac --json-auth`) |
-| `AZURE_SUBSCRIPTION` | Azure subscription name or ID |
-| `GCP_CREDENTIALS_JSON` | GCP service account key JSON |
-| `GCP_PROJECT` | GCP project ID |
-| `CLOUDFLARE_API_TOKEN` | Cloudflare API token (Zone:DNS:Edit) |
-| `CLOUDFLARE_ZONE_ID` | Cloudflare zone ID |
-| `TELEPORT_ACME_EMAIL` | Email for Let's Encrypt certificates |
-| `PORTAINER_ADMIN_PASSWORD` | Portainer admin password for API automation |
+The workflows require an Azure service principal, a GCP service account, and 8 GitHub repository secrets. Helper scripts automate the entire setup:
+
+1. **Create the Azure service principal** (requires `az` CLI, logged in):
+
+   ```bash
+   ./scripts/github/create-azure-sp.sh
+   ```
+
+   Creates a service principal with Contributor role scoped to `portainer-rg` and the AKS-managed infrastructure resource group. Writes credentials to `scripts/github/azure-sp.json`.
+
+2. **Create the GCP service account** (requires `gcloud` CLI, authenticated):
+
+   ```bash
+   ./scripts/github/create-gcp-sa.sh
+   ```
+
+   Creates a service account with `roles/container.admin` (GKE cluster CRUD) and `roles/iam.serviceAccountUser` (required for GKE node pool creation). Writes key to `scripts/github/gcp-sa-key.json`.
+
+3. **Configure all GitHub secrets** (requires `gh` CLI, authenticated):
+
+   ```bash
+   ./scripts/github/configure-secrets.sh
+   ```
+
+   Reads from `.envrc` and the credential files above to set all 8 secrets on the repository. Prompts you to save credentials to a password manager before cleaning up.
+
+4. **Clean up credential files:**
+
+   ```bash
+   rm scripts/github/azure-sp.json scripts/github/gcp-sa-key.json
+   ```
+
+### Required Secrets
+
+| Secret | Description | Source |
+|--------|-------------|--------|
+| `AZURE_CREDENTIALS` | Azure service principal JSON | `create-azure-sp.sh` |
+| `AZURE_SUBSCRIPTION` | Azure subscription name or ID | `.envrc` |
+| `GCP_CREDENTIALS_JSON` | GCP service account key JSON | `create-gcp-sa.sh` |
+| `GCP_PROJECT` | GCP project ID | `.envrc` |
+| `CLOUDFLARE_API_TOKEN` | Cloudflare API token (Zone:DNS:Edit) | `.envrc` |
+| `CLOUDFLARE_ZONE_ID` | Cloudflare zone ID | `.envrc` |
+| `TELEPORT_ACME_EMAIL` | Email for Let's Encrypt certificates | `.envrc` |
+| `PORTAINER_ADMIN_PASSWORD` | Portainer admin password for API automation | `.envrc` |
 
 ## Prerequisites
 
@@ -85,6 +119,7 @@ All workflows are triggered manually via `workflow_dispatch` from the GitHub Act
 - [kubectl](https://kubernetes.io/docs/tasks/tools/)
 - [Helm](https://helm.sh/docs/intro/install/)
 - [jq](https://jqlang.github.io/jq/download/)
+- [GitHub CLI](https://cli.github.com/) (`gh`) — for configuring workflow secrets
 - An Azure subscription
 - A GCP project with billing enabled
 - A Cloudflare-managed domain (for DNS)
