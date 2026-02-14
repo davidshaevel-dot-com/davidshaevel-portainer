@@ -20,9 +20,10 @@ Evolve the davidshaevel-portainer project into a full Kubernetes developer platf
 ### Cloud Strategy
 
 **Azure is the primary cloud provider** for the always-on control plane:
-- AKS cluster: Portainer, Teleport, Argo CD, Crossplane, monitoring stack
+- Resource group: `k8s-developer-platform-rg` (eastus)
+- AKS cluster: `k8s-developer-platform-aks` — Portainer, Teleport, Argo CD, Crossplane, monitoring stack
 - Azure Container Registry (ACR): Primary image registry
-- All existing davidshaevel-portainer infrastructure carries forward
+- Fresh infrastructure (not carried forward from portainer-rg / portainer-aks)
 
 **GCP and AWS are ephemeral workload environments:**
 - GKE clusters (GCP): Created/destroyed on demand via GitHub Actions or Crossplane
@@ -96,14 +97,14 @@ Azure Workload Cluster (Azure, ephemeral)
 
 ### Migration from davidshaevel-portainer
 
-davidshaevel-k8s-platform starts fresh (not a fork) but carries forward:
+davidshaevel-k8s-platform starts fresh (not a fork) but copies forward:
 - All scripts from `scripts/` (aks/, gke/, portainer/, teleport/, github/)
 - GitHub Actions workflows (`.github/workflows/`)
-- `scripts/config.sh` shared configuration
+- `scripts/config.sh` shared configuration (updated with new resource group / cluster names)
 - `.envrc.example` template
 - Design documents from `docs/plans/`
 
-davidshaevel-portainer is archived after migration (read-only, README points to new repo).
+New Azure infrastructure is created from scratch (`k8s-developer-platform-rg` / `k8s-developer-platform-aks`), separate from the original `portainer-rg` / `portainer-aks`. davidshaevel-portainer is archived after migration (read-only, README points to new repo).
 
 ### Repository Structure (davidshaevel-k8s-platform)
 
@@ -142,12 +143,18 @@ davidshaevel-k8s-platform/
 
 ## Phased Implementation
 
-### Phase 1: Repo Setup and Migration
+### Phase 1: Repo Setup and Infrastructure
 - Create davidshaevel-k8s-platform repository
-- Migrate scripts, workflows, configs from davidshaevel-portainer
+- Copy scripts, workflows, configs from davidshaevel-portainer
 - Set up bare repo + worktree structure
+- Update `scripts/config.sh` with new names (`k8s-developer-platform-rg`, `k8s-developer-platform-aks`)
+- Create resource group `k8s-developer-platform-rg` in eastus
+- Create AKS cluster `k8s-developer-platform-aks`
+- Install Portainer BE, Teleport, Teleport agent (using existing scripts)
+- Configure Cloudflare DNS for Teleport
+- Create new Azure service principal scoped to `k8s-developer-platform-rg`
 - Configure GitHub secrets
-- Verify existing functionality (AKS Start/Stop, GKE Start/Stop) works from new repo
+- Verify AKS Start/Stop, GKE Start/Stop workflows work from new repo
 
 ### Phase 2: Container Images and ACR
 - Create Azure Container Registry
@@ -162,7 +169,7 @@ davidshaevel-k8s-platform/
 - Set up GitOps workflow: push to repo → Argo CD syncs to cluster
 
 ### Phase 4: Cilium
-- Replace default CNI on AKS with Cilium
+- Enable Azure CNI Powered by Cilium on AKS (`az aks update --network-dataplane cilium`)
 - Enable Hubble for network flow observability
 - Define network policies for namespace isolation
 - Install Hubble UI (accessible via Teleport)
