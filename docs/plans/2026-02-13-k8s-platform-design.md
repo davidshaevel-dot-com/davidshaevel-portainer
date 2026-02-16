@@ -70,14 +70,14 @@ GKE Workload Cluster (GCP, ephemeral)
 ├── portainer namespace        → Portainer Agent
 ├── teleport-cluster namespace → Teleport kube agent
 ├── cilium namespace           → Cilium CNI + Hubble relay
-├── argocd namespace           → Argo CD agent
+├── argocd namespace           → Registered with Argo CD (managed from control plane)
 └── workload namespaces        → Application deployments
 
 EKS Workload Cluster (AWS, ephemeral)
 ├── portainer namespace        → Portainer Agent
 ├── teleport-cluster namespace → Teleport kube agent
 ├── cilium namespace           → Cilium CNI + Hubble relay
-├── argocd namespace           → Argo CD agent
+├── argocd namespace           → Registered with Argo CD (managed from control plane)
 └── workload namespaces        → Application deployments
 
 Azure Workload Cluster (Azure, ephemeral)
@@ -149,7 +149,7 @@ davidshaevel-k8s-platform/
 - Set up bare repo + worktree structure
 - Update `scripts/config.sh` with new names (`k8s-developer-platform-rg`, `k8s-developer-platform-aks`)
 - Create resource group `k8s-developer-platform-rg` in eastus
-- Create AKS cluster `k8s-developer-platform-aks`
+- Create AKS cluster `k8s-developer-platform-aks` with Azure CNI Powered by Cilium (`--network-dataplane cilium`)
 - Install Portainer BE, Teleport, Teleport agent (using existing scripts)
 - Configure Cloudflare DNS for Teleport
 - Create new Azure service principal scoped to `k8s-developer-platform-rg`
@@ -169,7 +169,7 @@ davidshaevel-k8s-platform/
 - Set up GitOps workflow: push to repo → Argo CD syncs to cluster
 
 ### Phase 4: Cilium
-- Enable Azure CNI Powered by Cilium on AKS (`az aks update --network-dataplane cilium`)
+- Cilium CNI is provisioned with the cluster in Phase 1 (`--network-dataplane cilium`)
 - Enable Hubble for network flow observability
 - Define network policies for namespace isolation
 - Install Hubble UI (accessible via Teleport)
@@ -220,8 +220,8 @@ Any application (e.g., dochound, davidshaevel.com) can be deployed to any cluste
 | AKS Managed Disks (PVs) | ~$5-10 | ~$5-10 |
 | ACR (Basic tier) | ~$5 | ~$5 |
 | GKE workload cluster | ~$25 | $0 (deleted) |
-| EKS workload cluster | ~$75 | $0 (deleted) |
-| **Total (all running)** | **~$160-195** | **~$10-15** |
+| EKS workload cluster (control plane + node) | ~$148 | $0 (deleted) |
+| **Total (all running)** | **~$230-270** | **~$10-15** |
 
 AKS stop/start preserves persistent volumes. GKE and EKS are fully deleted when stopped ($0). ACR and managed disks are the only costs when everything is down.
 
