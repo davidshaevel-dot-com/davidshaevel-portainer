@@ -123,7 +123,7 @@ davidshaevel-k8s-platform/
 │   ├── teleport/                    # Teleport server + agent
 │   ├── argocd/                      # Argo CD installation
 │   ├── cilium/                      # Cilium + Hubble installation
-│   ├── crossplane/                  # Crossplane + providers
+│   ├── crossplane/                  # Crossplane installation scripts
 │   ├── external-secrets/            # External Secrets Operator
 │   ├── monitoring/                  # Prometheus + Grafana + Alertmanager + Loki
 │   ├── devstand/                    # DevStand installation
@@ -158,7 +158,7 @@ davidshaevel-k8s-platform/
 - Install Portainer BE, Teleport, Teleport agent (using existing scripts)
 - Configure Cloudflare DNS for Teleport
 - Create new Azure service principal scoped to `k8s-developer-platform-rg`
-- Configure GitHub secrets
+- Configure GitHub secrets (Azure service principal, GCP credentials, Cloudflare API token)
 - Verify AKS Start/Stop, GKE Start/Stop workflows work from new repo
 
 ### Phase 2: Container Images and ACR
@@ -187,6 +187,7 @@ davidshaevel-k8s-platform/
 - Configure `ProviderConfig` credentials (initially manual K8s secrets, migrated to ESO-managed secrets in Phase 9)
 - Create compositions for GKE and EKS cluster provisioning
 - Replace `gcloud container clusters create` with Crossplane claims
+- Update GKE lifecycle GitHub Actions workflows and scripts to use Crossplane claims instead of gcloud commands
 - Add Azure provider for ephemeral Azure workload clusters
 
 ### Phase 6: DevStand
@@ -272,6 +273,6 @@ AKS stop/start preserves persistent volumes. GKE and EKS are fully deleted when 
 | 7 | Install and configure Prometheus, Grafana, and Alertmanager | Medium | #1 |
 | 8 | Add EKS cluster lifecycle | Low | #5 |
 | 9 | Rename davidshaevel-platform to davidshaevel-ecs-platform | Medium | #1 |
-| 10 | Archive davidshaevel-portainer | Medium | #9 |
+| 10 | Archive davidshaevel-portainer | Medium | #1 |
 | 11 | Set up secrets management with External Secrets Operator | Medium | #1 |
 | 12 | Set up log aggregation with Grafana Loki | Medium | #7 |
