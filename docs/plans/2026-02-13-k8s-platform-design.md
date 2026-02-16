@@ -68,13 +68,13 @@ AKS Control Plane (Azure, always-on when active)
 ├── cilium namespace           → Cilium CNI + Hubble
 └── devstand namespace         → DevStand portal
 
-GKE Workload Cluster (GCP, ephemeral) — registered with Argo CD via kube-system service account
+GKE Workload Cluster (GCP, ephemeral) — registered with Argo CD via dedicated service account
 ├── portainer namespace        → Portainer Agent
 ├── teleport-cluster namespace → Teleport kube agent
 ├── cilium namespace           → Cilium CNI + Hubble relay
 └── workload namespaces        → Application deployments
 
-EKS Workload Cluster (AWS, ephemeral) — registered with Argo CD via kube-system service account
+EKS Workload Cluster (AWS, ephemeral) — registered with Argo CD via dedicated service account
 ├── portainer namespace        → Portainer Agent
 ├── teleport-cluster namespace → Teleport kube agent
 ├── cilium namespace           → Cilium CNI + Hubble relay
