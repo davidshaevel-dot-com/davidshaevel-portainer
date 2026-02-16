@@ -251,7 +251,7 @@ Any application (e.g., dochound, davidshaevel.com) can be deployed to any cluste
 | ACR (Basic tier) | ~$5 | ~$5 |
 | Azure Key Vault (Standard) | <$1 | <$1 |
 | GKE workload cluster (e2-medium node) | ~$25 | $0 (deleted) |
-| GKE control plane (free tier credit) | Free | -- |
+| GKE control plane (free tier credit) | Free | $0 (deleted) |
 | EKS workload cluster (t3.medium node) | ~$30 | $0 (deleted) |
 | EKS control plane | ~$73 | $0 (deleted) |
 | **Total (all running)** | **~$215-255** | **~$10-15** |
