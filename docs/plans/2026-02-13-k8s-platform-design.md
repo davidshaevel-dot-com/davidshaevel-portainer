@@ -273,7 +273,7 @@ AKS stop/start preserves persistent volumes. GKE and EKS are fully deleted when 
 | 4 | Configure Hubble and Cilium network policies | Medium | #1 |
 | 5 | Install and configure Crossplane | Medium | #3 |
 | 6 | Install and configure DevStand | Medium | #5 |
-| 7 | Install and configure Prometheus, Grafana, and Alertmanager | Medium | #1 |
+| 7 | Install and configure Prometheus, Grafana, and Alertmanager | Medium | #1, #4 |
 | 8 | Add EKS cluster lifecycle | Low | #5 |
 | 9 | Set up secrets management with External Secrets Operator | Medium | #1 |
 | 10 | Set up log aggregation with Grafana Loki | Medium | #7 |
