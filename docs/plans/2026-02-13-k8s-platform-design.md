@@ -34,7 +34,7 @@ Evolve the davidshaevel-portainer project into a full Kubernetes developer platf
 - ACR is the single source of truth for container images
 - GCP Artifact Registry: Replicated from ACR when GKE environments are active
 - AWS ECR: Replicated from ACR when EKS environments are active
-- Replication is automated — images are pushed to ACR, synced to active cloud registries
+- Replication via GitHub Actions CI/CD pipeline — image builds push to ACR, then push to the target cloud's registry (Artifact Registry or ECR) in the same workflow. ACR's built-in geo-replication only works within Azure regions, not across cloud providers.
 
 ### Platform Stack
 
@@ -70,7 +70,7 @@ GKE Workload Cluster (GCP, ephemeral)
 ├── portainer namespace        → Portainer Agent
 ├── teleport-cluster namespace → Teleport kube agent
 ├── cilium namespace           → Cilium CNI + Hubble relay
-├── argocd namespace           → Argo CD agent (or managed by control plane)
+├── argocd namespace           → Argo CD agent
 └── workload namespaces        → Application deployments
 
 EKS Workload Cluster (AWS, ephemeral)
