@@ -273,7 +273,7 @@ AKS stop/start preserves persistent volumes. GKE and EKS are fully deleted when 
 | 6 | Install and configure DevStand | Medium | #5 |
 | 7 | Install and configure Prometheus, Grafana, and Alertmanager | Medium | #1 |
 | 8 | Add EKS cluster lifecycle | Low | #5 |
-| 9 | Rename davidshaevel-platform to davidshaevel-ecs-platform | Medium | #1 |
-| 10 | Archive davidshaevel-portainer | Medium | #1 |
-| 11 | Set up secrets management with External Secrets Operator | Medium | #1 |
-| 12 | Set up log aggregation with Grafana Loki | Medium | #7 |
+| 9 | Set up secrets management with External Secrets Operator | Medium | #1 |
+| 10 | Set up log aggregation with Grafana Loki | Medium | #7 |
+| 11 | Rename davidshaevel-platform to davidshaevel-ecs-platform | Medium | #1 |
+| 12 | Archive davidshaevel-portainer | Medium | #1 |
