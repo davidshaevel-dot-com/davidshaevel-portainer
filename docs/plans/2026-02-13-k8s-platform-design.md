@@ -30,11 +30,13 @@ Evolve the davidshaevel-portainer project into a full Kubernetes developer platf
 - EKS clusters (AWS): Created/destroyed on demand via Crossplane
 - Azure workload clusters: Also ephemeral, created alongside GCP/AWS
 
-**ACR as primary registry** with replication:
+**ACR as primary registry** with decoupled replication:
 - ACR is the single source of truth for container images
 - GCP Artifact Registry: Replicated from ACR when GKE environments are active
 - AWS ECR: Replicated from ACR when EKS environments are active
-- Replication via GitHub Actions CI/CD pipeline — image builds push to ACR, then push to the target cloud's registry (Artifact Registry or ECR) in the same workflow. ACR's built-in geo-replication only works within Azure regions, not across cloud providers.
+- **Build workflow:** Builds image and pushes to ACR only. Build success is never blocked by downstream registries.
+- **Replication workflow:** Triggers after build succeeds (`workflow_run`) or manually. Pulls from ACR and pushes to target cloud registries. Each cloud is a separate job — failures are isolated and independently retryable. Only replicates to clouds that are currently active.
+- ACR's built-in geo-replication only works within Azure regions, not across cloud providers.
 
 ### Platform Stack
 
@@ -160,7 +162,8 @@ davidshaevel-k8s-platform/
 - Create Azure Container Registry
 - Build and push davidshaevel.com images to ACR
 - Set up ACR credentials for AKS (managed identity or image pull secret)
-- Document replication strategy for GCP Artifact Registry and AWS ECR
+- Create build workflow (build → push to ACR)
+- Create replication workflow (pull from ACR → push to active cloud registries, one job per cloud)
 
 ### Phase 3: Argo CD
 - Install Argo CD on AKS control plane via Helm
@@ -190,6 +193,7 @@ davidshaevel-k8s-platform/
 - Install Prometheus + Grafana + Alertmanager via kube-prometheus-stack Helm chart
 - Configure Grafana dashboards for cluster and workload metrics
 - Hubble provides network-layer observability (installed with Cilium in Phase 4)
+- Configure Prometheus to scrape Cilium and Hubble metrics
 - Register Grafana via Teleport (app access)
 - Set up basic alerting rules
 
@@ -203,8 +207,8 @@ davidshaevel-k8s-platform/
 ## Workload Deployment
 
 Any application (e.g., dochound, davidshaevel.com) can be deployed to any cluster:
-1. Push container image to ACR
-2. ACR replicates to target cloud's registry
+1. Push container image to ACR (build workflow)
+2. Replication workflow pushes to target cloud's registry
 3. Create Argo CD application manifest pointing to the workload repo
 4. Argo CD deploys to the target cluster
 5. Cilium network policies control traffic
