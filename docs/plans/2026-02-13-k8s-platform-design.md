@@ -67,7 +67,7 @@ AKS Control Plane (Azure, always-on when active)
 ├── teleport-cluster namespace → Teleport proxy + auth + agents
 ├── argocd namespace           → Argo CD server + controllers
 ├── crossplane-system namespace → Crossplane + providers
-├── external-secrets namespace → External Secrets Operator + SecretStore
+├── external-secrets namespace → External Secrets Operator + ClusterSecretStore
 ├── monitoring namespace       → Prometheus + Grafana + Alertmanager + Loki
 ├── cilium namespace           → Cilium CNI + Hubble
 └── devstand namespace         → DevStand portal
