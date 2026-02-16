@@ -166,7 +166,7 @@ davidshaevel-k8s-platform/
 ### Phase 3: Argo CD
 - Install Argo CD on AKS control plane via Helm
 - Register via Teleport (app access)
-- Create Argo CD applications for existing platform components
+- Create Argo CD applications for existing platform components (e.g., Portainer, Teleport)
 - Set up GitOps workflow: push to repo → Argo CD syncs to cluster
 
 ### Phase 4: Cilium
