@@ -234,12 +234,14 @@ AKS stop/start preserves persistent volumes. GKE and EKS are fully deleted when 
 **Project:** Kubernetes Developer Platform
 **Team:** Team Tacocat
 
+> **Note:** Phase numbers describe logical architecture layers (ordered for readability). The `Blocked By` column below reflects actual execution dependencies — issues without upstream blockers can run in parallel regardless of phase number.
+
 | # | Issue | Priority | Blocked By |
 |---|-------|----------|------------|
 | 1 | Repo setup and migration from davidshaevel-portainer | High | -- |
 | 2 | Container images and ACR setup | High | #1 |
 | 3 | Install and configure Argo CD | High | #2 |
-| 4 | Install and configure Cilium and Hubble | Medium | #1 |
+| 4 | Configure Hubble and Cilium network policies | Medium | #1 |
 | 5 | Install and configure Crossplane | Medium | #3 |
 | 6 | Install and configure DevStand | Medium | #5 |
 | 7 | Install and configure Prometheus, Grafana, and Alertmanager | Medium | #1 |
