@@ -22,6 +22,7 @@ Evolve the davidshaevel-portainer project into a full Kubernetes developer platf
 **Azure is the primary cloud provider** for the always-on control plane:
 - Resource group: `k8s-developer-platform-rg` (eastus)
 - AKS cluster: `k8s-developer-platform-aks` — Portainer, Teleport, Argo CD, Crossplane, monitoring stack
+- Azure Key Vault: Secrets management backend for External Secrets Operator
 - Azure Container Registry (ACR): Primary image registry
 - Fresh infrastructure (not carried forward from portainer-rg / portainer-aks)
 
@@ -48,7 +49,9 @@ Evolve the davidshaevel-portainer project into a full Kubernetes developer platf
 | Networking | Cilium + Hubble | eBPF-based CNI, network policies, observability |
 | Infrastructure | Crossplane | Provision cloud resources (GKE, EKS clusters) from K8s |
 | Developer Portal | DevStand | Developer self-service portal |
+| Secrets Management | External Secrets Operator | Sync secrets from Azure Key Vault to K8s |
 | Monitoring | Prometheus | Metrics collection |
+| Logging | Grafana Loki | Log aggregation and search |
 | Dashboards | Grafana | Visualization and dashboards |
 | Alerting | Alertmanager | Alert routing and notification |
 | Network Observability | Hubble (via Cilium) | Service map, network flow visualization |
@@ -64,7 +67,8 @@ AKS Control Plane (Azure, always-on when active)
 ├── teleport-cluster namespace → Teleport proxy + auth + agents
 ├── argocd namespace           → Argo CD server + controllers
 ├── crossplane-system namespace → Crossplane + providers
-├── monitoring namespace       → Prometheus + Grafana + Alertmanager
+├── external-secrets namespace → External Secrets Operator + SecretStore
+├── monitoring namespace       → Prometheus + Grafana + Alertmanager + Loki
 ├── cilium namespace           → Cilium CNI + Hubble
 └── devstand namespace         → DevStand portal
 
@@ -120,7 +124,8 @@ davidshaevel-k8s-platform/
 │   ├── argocd/                      # Argo CD installation
 │   ├── cilium/                      # Cilium + Hubble installation
 │   ├── crossplane/                  # Crossplane + providers
-│   ├── monitoring/                  # Prometheus + Grafana + Alertmanager
+│   ├── external-secrets/            # External Secrets Operator
+│   ├── monitoring/                  # Prometheus + Grafana + Alertmanager + Loki
 │   ├── devstand/                    # DevStand installation
 │   ├── acr/                         # ACR setup + replication
 │   └── github/                      # GitHub Actions setup
@@ -202,6 +207,22 @@ davidshaevel-k8s-platform/
 - Set up ACR → ECR image replication
 - Install platform agents (Portainer, Teleport, Cilium) on EKS
 
+### Phase 9: Secrets Management
+- Create Azure Key Vault in `k8s-developer-platform-rg`
+- Install External Secrets Operator (ESO) via Helm on AKS (`external-secrets` namespace)
+- Configure `ClusterSecretStore` to connect to Azure Key Vault (via workload identity or service principal)
+- Migrate existing hardcoded secrets (Teleport, Portainer, ACR credentials) to Key Vault + `ExternalSecret` resources
+- Add install/uninstall scripts to `scripts/external-secrets/`
+- Store Helm value overrides in `helm-values/external-secrets/`
+
+### Phase 10: Logging
+- Install Grafana Loki via Helm on AKS (`monitoring` namespace, alongside Prometheus stack)
+- Deploy Promtail as DaemonSet for log collection
+- Configure Grafana data source for Loki
+- Configure log retention (Azure Blob Storage or local PV for cost optimization)
+- Set up basic LogQL queries and Grafana dashboards for log exploration
+- Add install/uninstall scripts to `scripts/monitoring/` (extend existing monitoring scripts)
+
 ## Workload Deployment
 
 Any application (e.g., dochound, davidshaevel.com) can be deployed to any cluster:
@@ -221,6 +242,7 @@ Any application (e.g., dochound, davidshaevel.com) can be deployed to any cluste
 | AKS Load Balancer (Teleport) | ~$18 | $0 |
 | AKS Managed Disks (PVs) | ~$5-10 | ~$5-10 |
 | ACR (Basic tier) | ~$5 | ~$5 |
+| Azure Key Vault (Standard) | <$1 | <$1 |
 | GKE workload cluster | ~$25 | $0 (deleted) |
 | EKS workload cluster (control plane + node) | ~$148 | $0 (deleted) |
 | **Total (all running)** | **~$230-270** | **~$10-15** |
@@ -246,3 +268,5 @@ AKS stop/start preserves persistent volumes. GKE and EKS are fully deleted when 
 | 8 | Add EKS cluster lifecycle | Low | #5 |
 | 9 | Rename davidshaevel-platform to davidshaevel-ecs-platform | Medium | #1 |
 | 10 | Archive davidshaevel-portainer | Medium | #9 |
+| 11 | Set up secrets management with External Secrets Operator | Medium | #1 |
+| 12 | Set up log aggregation with Grafana Loki | Medium | #7 |
