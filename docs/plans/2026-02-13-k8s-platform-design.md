@@ -131,6 +131,7 @@ davidshaevel-k8s-platform/
 │   └── github/                      # GitHub Actions setup
 ├── helm-values/                     # Helm value overrides per tool
 ├── crossplane/                      # Crossplane compositions and claims
+│   ├── xrds/                        # Composite Resource Definitions (API contracts)
 │   ├── compositions/                # Reusable cloud resource templates
 │   └── claims/                      # Environment-specific claims
 ├── argocd/                          # Argo CD application manifests
