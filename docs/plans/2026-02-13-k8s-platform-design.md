@@ -76,12 +76,14 @@ GKE Workload Cluster (GCP, ephemeral) — registered with Argo CD via dedicated 
 ├── portainer namespace        → Portainer Agent
 ├── teleport-cluster namespace → Teleport kube agent
 ├── cilium namespace           → Cilium CNI + Hubble relay
+├── external-secrets namespace → External Secrets Operator + ClusterSecretStore
 └── workload namespaces        → Application deployments
 
 EKS Workload Cluster (AWS, ephemeral) — registered with Argo CD via dedicated service account
 ├── portainer namespace        → Portainer Agent
 ├── teleport-cluster namespace → Teleport kube agent
 ├── cilium namespace           → Cilium CNI + Hubble relay
+├── external-secrets namespace → External Secrets Operator + ClusterSecretStore
 └── workload namespaces        → Application deployments
 
 Azure Workload Cluster (Azure, ephemeral)
@@ -209,14 +211,14 @@ davidshaevel-k8s-platform/
 - Create EKS cluster composition
 - Add EKS lifecycle workflows (GitHub Actions)
 - Set up ACR → ECR image replication
-- Install platform agents (Portainer, Teleport, Cilium) on EKS
+- Install platform agents (Portainer, Teleport, Cilium, ESO) on EKS
 
 ### Phase 9: Secrets Management
 - Create Azure Key Vault in `k8s-developer-platform-rg`
 - Install External Secrets Operator (ESO) via Helm on AKS (`external-secrets` namespace)
 - Configure `ClusterSecretStore` to connect to Azure Key Vault (via workload identity or service principal)
 - Migrate existing hardcoded secrets (Teleport, Portainer, ACR credentials) to Key Vault + `ExternalSecret` resources
-- Workload clusters: Install ESO on each ephemeral cluster as part of platform agent setup, with `ClusterSecretStore` pointing to Azure Key Vault as the single source of truth
+- Workload clusters: Install ESO on each ephemeral cluster as part of platform agent setup, with `ClusterSecretStore` pointing to Azure Key Vault as the single source of truth. Cross-cloud authentication: GKE uses Workload Identity Federation, EKS uses IAM OIDC provider with IRSA
 - Add install/uninstall scripts to `scripts/external-secrets/`
 - Store Helm value overrides in `helm-values/external-secrets/`
 
