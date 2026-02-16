@@ -218,7 +218,7 @@ davidshaevel-k8s-platform/
 - Install External Secrets Operator (ESO) via Helm on AKS (`external-secrets` namespace)
 - Configure `ClusterSecretStore` to connect to Azure Key Vault (via workload identity or service principal)
 - Migrate existing hardcoded secrets (Teleport, Portainer, ACR credentials) to Key Vault + `ExternalSecret` resources
-- Workload clusters: Install ESO on each ephemeral cluster as part of platform agent setup, with `ClusterSecretStore` pointing to Azure Key Vault as the single source of truth. Cross-cloud authentication: GKE uses Workload Identity Federation, EKS uses IAM OIDC provider with IRSA
+- Workload clusters: Install ESO on each ephemeral cluster as part of platform agent setup, with `ClusterSecretStore` pointing to Azure Key Vault as the single source of truth. Cross-cloud authentication: GKE uses Workload Identity Federation, EKS uses IAM OIDC provider with IRSA, Azure workload clusters use Azure AD Workload Identity
 - Add install/uninstall scripts to `scripts/external-secrets/`
 - Store Helm value overrides in `helm-values/external-secrets/`
 
@@ -269,7 +269,7 @@ AKS stop/start preserves persistent volumes. GKE and EKS are fully deleted when 
 |---|-------|----------|------------|
 | 1 | Repo setup and migration from davidshaevel-portainer | High | -- |
 | 2 | Container images and ACR setup | High | #1 |
-| 3 | Install and configure Argo CD | High | #2 |
+| 3 | Install and configure Argo CD | High | #1 |
 | 4 | Configure Hubble and Cilium network policies | Medium | #1 |
 | 5 | Install and configure Crossplane | Medium | #3 |
 | 6 | Install and configure DevStand | Medium | #5 |
