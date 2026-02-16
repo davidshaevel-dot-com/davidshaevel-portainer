@@ -207,7 +207,7 @@ davidshaevel-k8s-platform/
 - Set up basic alerting rules
 
 ### Phase 8: EKS
-- Add AWS provider to Crossplane (if not already in Phase 5)
+- Verify Crossplane AWS provider is installed and configured
 - Create EKS cluster composition
 - Add EKS lifecycle workflows (GitHub Actions)
 - Set up ACR → ECR image replication
