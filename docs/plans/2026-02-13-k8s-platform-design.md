@@ -214,8 +214,8 @@ Any application (e.g., dochound, davidshaevel.com) can be deployed to any cluste
 
 ## Cost Strategy
 
-| Component | Running | Stopped |
-|-----------|---------|---------|
+| Component | Running (per month) | Stopped (per month) |
+|-----------|---------------------|---------------------|
 | AKS control plane (free tier) | Free | Free |
 | AKS node (Standard_B2s or larger) | ~$30-60 | $0 |
 | AKS Load Balancer (Teleport) | ~$18 | $0 |
