@@ -149,7 +149,7 @@ davidshaevel-k8s-platform/
 - Set up bare repo + worktree structure
 - Update `scripts/config.sh` with new names (`k8s-developer-platform-rg`, `k8s-developer-platform-aks`)
 - Create resource group `k8s-developer-platform-rg` in eastus
-- Create AKS cluster `k8s-developer-platform-aks` with Azure CNI Powered by Cilium (`--network-dataplane cilium`)
+- Create AKS cluster `k8s-developer-platform-aks` with Azure CNI Overlay + Cilium (`--network-plugin azure --network-dataplane cilium --network-plugin-mode overlay`)
 - Install Portainer BE, Teleport, Teleport agent (using existing scripts)
 - Configure Cloudflare DNS for Teleport
 - Create new Azure service principal scoped to `k8s-developer-platform-rg`
