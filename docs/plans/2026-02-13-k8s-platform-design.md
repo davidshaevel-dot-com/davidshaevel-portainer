@@ -243,7 +243,7 @@ Any application (e.g., dochound, davidshaevel.com) can be deployed to any cluste
 | Component | Running (per month) | Stopped (per month) |
 |-----------|---------------------|---------------------|
 | AKS control plane (free tier) | Free | Free |
-| AKS node (Standard_B2s or larger) | ~$30-60 | $0 |
+| AKS node (Standard_B2ms or larger, 8GB+ RAM) | ~$60-90 | $0 |
 | AKS Load Balancer (Teleport) | ~$18 | $0 |
 | AKS Managed Disks (PVs) | ~$5-10 | ~$5-10 |
 | ACR (Basic tier) | ~$5 | ~$5 |
@@ -252,7 +252,7 @@ Any application (e.g., dochound, davidshaevel.com) can be deployed to any cluste
 | GKE control plane (free tier credit) | Free | -- |
 | EKS workload cluster (t3.medium node) | ~$30 | $0 (deleted) |
 | EKS control plane | ~$73 | $0 (deleted) |
-| **Total (all running)** | **~$185-225** | **~$10-15** |
+| **Total (all running)** | **~$215-255** | **~$10-15** |
 
 AKS stop/start preserves persistent volumes. GKE and EKS are fully deleted when stopped ($0). ACR, Key Vault, and managed disks are the only costs when everything is down. GKE free tier provides $74.40/month credit per billing account, covering the control plane for one zonal cluster. Without the free tier, GKE would add ~$73/month.
 
