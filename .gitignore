@@ -58,3 +58,4 @@ tmp/
 # Claude Code context files
 .claude/
 CLAUDE.local.md
+SESSION_LOG.md
