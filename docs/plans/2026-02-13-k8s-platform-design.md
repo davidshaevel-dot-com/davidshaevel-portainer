@@ -179,10 +179,12 @@ davidshaevel-k8s-platform/
 - Enable Hubble for network flow observability
 - Define network policies for namespace isolation
 - Install Hubble UI (accessible via Teleport)
+- Workload clusters: GKE uses Dataplane V2 (Cilium-based) at creation; EKS installs Cilium via Helm as part of platform agent setup (Phase 8)
 
 ### Phase 5: Crossplane
 - Install Crossplane on AKS control plane
 - Install GCP and AWS providers
+- Configure `ProviderConfig` credentials (initially manual K8s secrets, migrated to ESO-managed secrets in Phase 9)
 - Create compositions for GKE and EKS cluster provisioning
 - Replace `gcloud container clusters create` with Crossplane claims
 - Add Azure provider for ephemeral Azure workload clusters
@@ -212,6 +214,7 @@ davidshaevel-k8s-platform/
 - Install External Secrets Operator (ESO) via Helm on AKS (`external-secrets` namespace)
 - Configure `ClusterSecretStore` to connect to Azure Key Vault (via workload identity or service principal)
 - Migrate existing hardcoded secrets (Teleport, Portainer, ACR credentials) to Key Vault + `ExternalSecret` resources
+- Workload clusters: Install ESO on each ephemeral cluster as part of platform agent setup, with `ClusterSecretStore` pointing to Azure Key Vault as the single source of truth
 - Add install/uninstall scripts to `scripts/external-secrets/`
 - Store Helm value overrides in `helm-values/external-secrets/`
 
@@ -243,11 +246,13 @@ Any application (e.g., dochound, davidshaevel.com) can be deployed to any cluste
 | AKS Managed Disks (PVs) | ~$5-10 | ~$5-10 |
 | ACR (Basic tier) | ~$5 | ~$5 |
 | Azure Key Vault (Standard) | <$1 | <$1 |
-| GKE workload cluster | ~$25 | $0 (deleted) |
-| EKS workload cluster (control plane + node) | ~$148 | $0 (deleted) |
-| **Total (all running)** | **~$230-270** | **~$10-15** |
+| GKE workload cluster (e2-medium node) | ~$25 | $0 (deleted) |
+| GKE control plane (free tier credit) | Free | -- |
+| EKS workload cluster (t3.medium node) | ~$30 | $0 (deleted) |
+| EKS control plane | ~$73 | $0 (deleted) |
+| **Total (all running)** | **~$185-225** | **~$10-15** |
 
-AKS stop/start preserves persistent volumes. GKE and EKS are fully deleted when stopped ($0). ACR and managed disks are the only costs when everything is down.
+AKS stop/start preserves persistent volumes. GKE and EKS are fully deleted when stopped ($0). ACR, Key Vault, and managed disks are the only costs when everything is down. GKE free tier provides $74.40/month credit per billing account, covering the control plane for one zonal cluster. Without the free tier, GKE would add ~$73/month.
 
 ## Linear Project Structure
 
